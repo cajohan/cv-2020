@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <title>我的简历</title>
+  <style>
+      * {
+          box-sizing: border-box;
+      }
+
+      body {
+          background: #eee;
+          margin: 20px 0;
+      }
+
+      article {
+          width: 21cm;
+          min-height: 29.7cm;
+          background: white;
+          margin: 0 auto;
+          overflow: auto;
+          padding: 1em;
+      }
+  </style>
+  <style media="print">
+      body {
+          margin: 0;
+      }
+
+      .page2 {
+          page-break-before: always;
+          margin-top: 30px;
+      }
+  </style>
+  <style>
+      body {
+      }
+
+      p {
+          margin: .3em 0;
+      }
+
+      h1 {
+          font-size: 25px;
+          margin-top: 0;
+      }
+
+      h4,
+      h5,
+      h6 {
+          font-weight: normal;
+      }
+
+      ol,
+      ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+      }
+
+      strong {
+          font-weight: normal;
+          color: #f60;
+      }
+
+      a {
+          color: #999;
+          text-decoration: none;
+          border-bottom: 1px solid;
+      }
+
+      p,
+      li {
+          color: #666;
+      }
+
+      strong {
+          font-weight: normal;
+      }
+
+      h3,
+      h4,
+      h5,
+      h6 {
+          margin: 0;
+      }
+
+      .bio {
+          position: relative;
+      }
+
+      .bio img {
+          position: absolute;
+          top: 0;
+          right: 0;
+      }
+  </style>
+  <style>
+      .projects {
+      }
+
+      .projects p {
+          color: #666;
+      }
+
+      .projects strong {
+          color: #f60;
+      }
+
+      .projects > ol {
+          margin-top: 0;
+          list-style-position: inside;
+          padding: 0;
+      }
+
+      .projects > ol > li {
+          margin-bottom: 24px;
+      }
+
+      .projects > ol > li > header {
+          display: flex;
+          justify-content: space-between;
+      }
+
+      .projects > ol > li h3 {
+          display: inline-block;
+      }
+  </style>
+  <style>
+      .openSource {
+      }
+
+      .openSource > h2 {
+      }
+
+      .openSource header img {
+          position: absolute;
+          top: 0;
+          right: 0;
+      }
+
+      .openSource > ul {
+      }
+
+      .openSource > ul > li {
+          margin-bottom: 24px;
+      }
+
+      .openSource header {
+          position: relative;
+          display: flex;
+          justify-content: space-between;
+      }
+
+      .openSource h3 {
+      }
+  </style>
+  <style>
+      @media (max-width: 500px) {
+          body {
+              margin: 0;
+          }
+
+          article {
+              width: auto;
+              height: auto;
+          }
+
+          .bio img {
+              display: none;
+          }
+
+          .skills .wrapper {
+              flex-direction: column;
+          }
+
+          #skills {
+              width: auto;
+          }
+
+          .jobs header {
+              flex-direction: column;
+          }
+
+          .jobs header > h3,
+          .jobs header > h4,
+          .jobs header > span {
+              margin: 0;
+          }
+      }
+  </style>
+</head>
+
+<body>
+<article>
+  <section class="bio">
+    <h1>陈俊煌</h1>
+    <img src="./image/0.jpg" alt="" width="100" height="122">
+    <p>
+      男 | 22岁 | 前端开发工程师 | 深圳
+    </p>
+    <p>
+      手机：<a href="tel:15219857297">15219857297</a> | 微信：15219857297 | 邮箱：<a href="mailto:1685259637@qq.com">1685259637@qq.com</a>
+    </p>
+  </section>
+
+
+  <section class="projects">
+    <h2>项目经历</h2>
+    <ol>
+      <li>
+        <header>
+          <h3>简单记账</h3>
+          <span>
+              <a href="https://github.com/cajohan/savemoney">源码链接</a>
+              <a href="http://chenjunhuang.top/saveMoney-website/#/money">项目预览</a>
+            </span>
+        </header>
+        <p>
+          一款基于 <strong>Vue</strong> / <strong>TypeScript</strong> / <strong>Webpack</strong> 的的极简移动端记账页面应用。
+
+        </p>
+        <p>
+          这是我从自己的需求出发制作的极简记账应用，特点是快速记账， 而且可以通过统计查看自己的消费习惯。
+
+        </p>
+        <p>
+          源代码几乎完全使用 <strong>TypeScript</strong> 实现，用到了装饰器语法，制作过程让我对 TypeScript 有了新的认识。
+
+        </p>
+      </li>
+      <li>
+        <header>
+          <h3>画一只皮卡丘</h3>
+          <span>
+              <a href="https://github.com/cajohan/pikachu">源码链接</a>
+              <a href="http://chenjunhuang.top/pikachu/src/index.html">项目预览</a>
+            </span>
+        </header>
+        <p>
+          这是一个我学习 <strong>CSS3</strong> 的一个可爱作品。
+        </p>
+        <p>
+          主要画了一只可爱的皮卡丘的脸，实现了鼠标悬停鼻子抖动，小闪电动画。
+        </p>
+      </li>
+      <li>
+        <header>
+          <h3>前端导航页面</h3>
+          <span>
+              <a href="https://github.com/cajohan/nav-1">源码链接</a>
+              <a href="http://chenjunhuang.top/nav-1/dist/index.html">项目预览</a>
+            </span>
+        </header>
+        <p>
+          一个基于 <strong>jQuery</strong> / <strong>媒体查询</strong> 的移动端单页面应用。
+        </p>
+
+        <p>
+          这是一个极简的导航页面，可进行搜索，添加快速访问网站。
+          该页面会监听英文输入状态的键盘，按下相关字母可快速打开网站。
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="openSource">
+    <h2>开源项目</h2>
+    <ul>
+      <li>
+        <header>
+          <h3>自己写的 DOM 库</h3>
+          <a href="https://github.com/cajohan/dom-demo-1">源码链接</a>
+        </header>
+        <p>实现了元素选择、元素创建、<strong>事件委托</strong>、滑动手势等常见功能</p>
+      </li>
+      <li class="page2">
+        <header>
+          <h3>手写jQuery</h3>
+          <span>
+              <a href="https://github.com/cajohan/dom-2">源码链接</a>
+          </span>
+        </header>
+        <p>这是我在学习 <strong>Dom</strong> 时尝试实现jQuery的某些功能</p>
+      </li>
+      <li>
+        <header>
+          <h3>简易画板</h3>
+          <span>
+              <a href="https://github.com/cajohan/canvas-demo-1">源码链接</a>
+              <a href="http://chenjunhuang.top/canvas-demo-1/">项目预览</a>
+            </span>
+        </header>
+        <p>我在学习 <strong>Canvas</strong> 时做的一个小作品</p>
+      </li>
+    </ul>
+  </section>
+
+  <section class="skills">
+    <h2>技能</h2>
+    <div class="wrapper">
+      <div id="skills"></div>
+      <ul>
+        <li>熟悉页面制作技巧，能将设计稿<strong>完美还原</strong></li>
+        <li>熟悉<strong>前后端分离</strong>技术，包括 AJAX、跨域、前端路由、Cookie、Session 等</li>
+        <li>熟练掌握 <strong>Vue全家桶</strong>的使用，包括 VueCli、VueRouter、Vuex 等</li>
+        <li>熟悉 ES6，包括 let / Promise / await / 析构赋值</li>
+        <li>了解 <strong>TypeScript</strong> 的使用，我的项目就是 TS 实现的</li>
+        <li>了解 <strong>Webpack 的配置和优化</strong></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="others">
+    <h2>其他链接</h2>
+    <ul>
+      <li><a href="https://www.zhihu.com/people/zhihusucks/posts/posts_by_votes">我的博客</a>，目前已有 20+ 篇技术文章</li>
+      <li><a href="https://github.com/frankfang">我的 GitHub</a></li>
+    </ul>
+  </section>
+
+  <section class="education">
+    <h2>教育经历</h2>
+    <p>
+      <span><time>2015年</time>~<time>2019年</time></span>
+      广东海洋大学 信息与计算科学 本科
+    </p>
+  </section>
+
+</article>
+</body>
+
+</html>
