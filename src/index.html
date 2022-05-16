@@ -31,7 +31,7 @@
     }
 
     .page2 {
-      page-break-before: always;
+      /*page-break-before: always;*/
       margin-top: 30px;
     }
   </style>
@@ -129,7 +129,9 @@
     }
   </style>
   <style>
-    .openSource {}
+    .openSource {
+      page-break-before: always;
+    }
 
     .openSource>h2 {}
 
@@ -228,13 +230,38 @@
     <h1>陈俊煌</h1>
     <img src="./image/0.jpg" alt="" width="100" height="122">
     <p>
-      男 | 22岁 | 前端开发工程师 | 深圳
+      男 | 24岁 | 前端开发工程师 | 深圳
     </p>
     <p>
       手机：<a href="tel:15219857297">15219857297</a> | 微信：15219857297 | 邮箱：<a href="mailto:1685259637@qq.com">1685259637@qq.com</a>
     </p>
   </section>
 
+
+  <section class="jobs">
+    <h2>工作经历</h2>
+    <ol>
+      <li>
+        <header>
+          <h3> 掌喜技术（深圳）有限公司 </h3>
+          <h4> 小程序开发工程师 </h4>
+          <span><time>2020年11月</time>~<time>2021年12月</time></span>
+        </header>
+      </li>
+      <p>
+        基于 taro（react语法）+mobx+TS 负责微信小程序的开发，使用f2进行相关数据可视化展示。
+      </p>
+      <p>
+        负责部门UI组件的开发，包括对话框、弹出框、选择器等通用组件。
+      </p>
+      <p>
+        深入了解了微信小程序的相关开发以及上线流程。
+      </p>
+      <p>
+        技术栈： <strong>taro（react语法）</strong> / <strong>TypeScript</strong> / <strong>mobx</strong> 。
+      </p>
+    </ol>
+  </section>
 
   <section class="projects">
     <h2>项目经历</h2>
@@ -389,17 +416,7 @@
     </ul>
   </section>
 
-  <section class="jobs">
-    <h2>工作经历</h2>
-    <ol>
-      <li>
-        <header>
-          <h3> 深圳市杰之龙通信技术有限公司 </h3>
-          <span><time>2019年10月</time>~<time>2020年7月</time></span>
-        </header>
-      </li>
-    </ol>
-  </section>
+
 
   <section class="others">
     <h2>其他链接</h2>
