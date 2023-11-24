@@ -1,0 +1,898 @@
+"proxies": {
+    "default": {
+      "httpProxy": "127.0.0.1:10808",
+      "httpsProxy": "127.0.0.1:10808",
+      "noProxy": "localhost,127.0.0.1"
+    }
+  },
+
+  https://do6urbpx.mirror.aliyuncs.com
+
+  rails new --api --database=postgresql --skip-test mangosteen-1
+
+docker run -d \ //\代表这行没结束
+    --name db-for-mangosteen \
+    -e POSTGRES_USER=mangosteen \ // 环境
+    -e POSTGRES_PASSWORD=123456 \
+    -e POSTGRES_DB=mangosteen_dev \
+    -e PGDATA=/var/lib/postgresql/data/pgdata \
+    -v mangosteen-data:/var/lib/postgresql/data \  //新的数据卷
+    --network=network1 \
+    postgres:14
+
+启动数据库：
+docker run -d \
+    --name db-for-mangosteen \
+    -e POSTGRES_USER=mangosteen \
+    -e POSTGRES_PASSWORD=123456 \
+    -e POSTGRES_DB=mangosteen_dev \
+    -e PGDATA=/var/lib/postgresql/data/pgdata \
+    -v mangosteen-data:/var/lib/postgresql/data \
+    --network=network1 \
+    postgres:14
+
+    docker run -d      --name db-for-mangosteen      -e POSTGRES_USER=mangosteen      -e POSTGRES_PASSWORD=123456      -e POSTGRES_DB=mangosteen_dev      -e PGDATA=/var/lib/postgresql/data/pgdata      -v mangosteen-data:/var/lib/postgresql/data      --network=network1      postgres:14
+
+gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/
+bundle config mirror.https://rubygems.org https://gems.ruby-china.com
+gem install rails -v 7.0.2.3
+pacman -S postgresql-libs
+cd ~/repos
+rails new --api --database=postgresql --skip-test mangosteen-1
+code mangosteen-1
+// 新建终端
+bundle exe rails server
+// 需要关闭 server 请按 Ctrl + C
+_________________
+连接数据库：
+development:
+  <<: *default
+  database: mangosteen_dev
+  username: mangosteen
+  password: 123456
+  host: db-for-mangosteen
+
+自上而下：先想大概，再添细节
+自下而上：用到什么加什么，会出现打脸的情况
+两种思路可以混合，我们先采用自下而上
+
+422不可处理实体
+
+五、REST风格：
+人话版总结：
+看见路径就知道请求什么东西
+看见动词就知道是什么操作
+看见状态码就知道结果是什么
+200 - 成功      201 - 创建成功
+404 - 未找到    403 - 没有权限    401 - 未登录
+422 - 无法处理，参数有问题         402 - 需付费
+412 - 不满足前提条件               429 - 请求太频繁
+400 - 其他所有错误，详细原因可以放在 body 里
+
+两种方案
+1. 使用 page 和 per_page 参数，见 kaminari 或 pagy 库
+2. 使用 start_id 和 limit 参数，需要 id 是自增数字
+
+两种方案
+1. 使用 SQL 自带的 LIKE 关键字
+2. 使用 elasticsearch、结巴分词等第三方工具
+
+
+
+Api的编写：
+bin/rails g model ValidationCode email:string kind:string used_at:datetime 建立
+
+建模工具：bin/rails g model user email:string name:string
+数据库操作工具：ActiveRecord::Migration
+同步到数据库：bin/rails db:migrate
+反悔命令：bin/rails  db:rollback step=1
+
+config/routes.rb
+get '/users/:id', to: 'users#show'
+post '/users/', to: 'users#create'
+
+bin/rails db:migrate 同步
+bin/rails g controller validation_codes create 接口，创建 Controller
+
+Ruby只有属性没有方法，全是对象
+
+REpresentational State Transfer
+不是标准、不是协议、不是接口，只是一种风格
+Roy 于 2000 年在自己博士论文中提到此术语
+Roy 曾参与撰写 HTTP 规格文档
+
+请求1：创建 item
+POST /api/v1/items
+Content-Type: application/json
+消息体 {"amount":99, "kind": "income"}
+响应 {"resource": {...}} 或 {"errors": {...}}
+请求2：创建 item
+POST /api/v1/items
+Content-Type: application/x-www-form-urlencoded
+消息体 amount=99&kind=income
+
+请求：更新 item
+PATCH /api/v1/items/1
+Content-Type: application/json
+消息体 {"amount":"11", "kind": "expense"}
+反风格：
+POST /api/v1/modify_item?id=1
+对方观点：全用 POST 多省事儿
+我方观点：有 DELETE 不用非要自己想，多费事儿啊
+
+请求：删除 item
+DELETE /api/v1/items/1
+
+反风格：
+POST /api/v1/remove_item?id=1
+反方观点：POST 省事儿
+我方观点：自己想路径，费事儿
+
+请求：获取一个或多个 item
+GET /api/v1/items/1
+GET /api/v1/items?page=1&per_page=10
+GET /api/v1/users/2/items
+GET /api/v1/items?user_id=2
+GET /api/v1/items?tags_id[]=1&tags_id[]=2
+GET /api/v1/items?tags_id=1,2
+GET /api/v1/items?sort_by[]=id+asc&sort_by[]=name+desc
+GET /api/v1/items?keyword=hi
+GET /api/v1/items/search/hi
+
+1. 以资源为中心
+2. 充分利用 HTTP 现有功能，如动词、状态码、头部字段
+3. GitHub API 就比较符合 REST，值得学习
+其实用一用就能秒懂 REST
+
+1. 尽量以资源为中心
+url 里的 items 就是资源
+2. 尽量使用 HTTP 现有功能
+其实响应头里也可以包含内容，但目前的例子都没有用到
+3. 可以适当违反规则
+比如 /api/v1/items/search/hi
+
+
+六、一些测试方法
+  1. 用curl
+    发送 GET 请求
+    curl http://localhost:3000/api/v1/tags?page=1 -v
+    发送 POST 请求
+    curl -X POST http://localhost:3000/api/v1/tags
+    添加请求头 -H 'Content-Type: application/json'
+    添加消息体 -d '{"amount":99}'
+    发送其他请求
+    curl -X PATCH ...
+    弊端：
+    1. 难写
+    2. 难批量
+    3. 难重复操作
+
+  2.
+
+
+七、网站部署
+如果需要密码：输一次下次自动登录
+ssh-copy-id root@120.77.206.191
+ssh root@120.77.206.191
+ssh mangosteen@120.77.206.191
+
+service sshd restart
+service sshd stop
+service sshd start
+
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+  apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+阿里云ECS Ubuntu 20.04安装docker
+sudo apt-get update
+sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get -y update
+sudo apt-get -y install docker-ce
+
+配置加速：
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://xxx.mirror.aliyuncs.com"]  
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+使用Nginx的好处：1. 负载均衡。2. 0宕机时间
+
+copilot?codeium?codeGeex?codeWhisperer?
+
+waka_b85f54d0-0275-47c1-aa74-4e7064e77834
+SBSB-PTCK
+
+ADD mangosteen-*.tar.gz ./
+ADD 会解压tar压缩包
+
+ENTRYPOINT bundle exec puma
+不用RUN防止永不结束
+
+八、秘钥管理
+默认vim打开，使用code打开
+EDITOR="vim" bin/rails credentials:edit 
+EDITOR="code --wait" bin/rails credentials:edit 
+
+RAILS_ENV=production rails c
+Rails.application.credentials.secret_key_base
+Rails.application.credentials.sconfig
+
+在宿主机运行命令
+RAILS_MASTER_KEY=xxxxxxxxxxxxxxx mangosteen_deploy/setup_host.sh
+
+DB_HOST=xxx DB_PASSWORD=xxx RAILS_MASTER_KEY=xxx mangosteen_deploy/setup_host.sh
+DB_HOST=db-for-mangosteen DB_PASSWORD=123456 RAILS_MASTER_KEY=382d6c6b7182042603d40923e39d9b63 mangosteen_deploy/setup_host.sh
+
+docker exec -it mangosteen-prod-1 bin/rails db:create db:migrate
+
+如何生成随机数
+bin/rake secret
+用于创建开发环境密钥的命令（重要命令，会反复用到）
+rm config/credentials.yml.enc
+EDITOR="code --wait" rails credentials:edit
+密钥汇总
+secret_key_base: xxx
+email_password: xxx
+hmac_secret: xxx
+
+九、部署到云端
+
+rsa-pub：ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCfkRZL4hNUmOV5deBo2BPqFkzSH/2GJVC8lLCP9xgMrkReJVo0oJW+9F8a0SJDSBS2oS/YXpdQKSrbqC9bjXntAxg9xkIlXUjo9Gg5Dxvp1UAAsOhembdxplbNz5Tvj3MS3OixDpa+7KnTeojFyST7VEX8eG+3jV/ISaPpQT6J1jR+rhd9KOlIJ+43fuFwhpq+XVGoJTB7o7otsCySjCvCi3ZHK/vPCiFHO/1gH4rmaLfMIoZYuLUrTwVmI1EdLzFbtjy1nXeGtzx46hqBSzwjG7W0fLfMH/43IPpkXEqUq9g+a+1so/srqHS+4dosG/cl5415XvaXU8n4NLjMrElTlv4vPqAOPx/CE8ODQoGdy3Cdpv7IwTLfe6iMchceLW0IHP1QObGr/LJ9VjlfDKtNOOAdypASq32ukDUN/tWSG1xK72cmny7nMm5iwsY/ZhLWEffA3JCefQDK1sn9zhCwch7jlrzzxoqItMxU9BCQtoWDahoCL4FN51cty5JxB2UCfHsQyzQFH5N1JT+uj2tgUniRcvM91eYIE2VFaLiWTGfNoDs1u4X1YX8C4o/Z0a4zWL+VIzvPfwm4StIXPXIa48cmbGosKtOlpafZeAplVsDGWn8M5gVCqMfDuspR+SYMediL7tUFHDdThmxasO5AapFpfY7YpQHRwG5TTQa3XQ== huangdi_c@163.com
+doc-rsa-pub：ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDhS5JyX1BFPgzORgOT69bMFHcR8Wkn0WPJsa1kEyHra/aBK7sAHcIlUg3mi5wgEhl+EW3jfO8Q7Y9YhWOhncY7DEf4sNjhsKU2GqWDuTao9Hqsi9U0pvZzNnjSB4Q/FFOceQeJj2abgO+vFj4WBw31QSY+p07ccTOszCVmi9edCcBRCNJ+BSKRkU1czNTtwGMcpY30f/uRoOhKTZigd/eWnwiPnazhyiZ5B0QJScMzWmEbLfY+p3tTbKo8+2W7B//U1kClbJa+3gSeuwGXgfnXJGSdmQis2w4xylWJZSrn6nHN0WN2sHh3h/X4lEQ88gOlj+mmpuOuMDLkBoRBgKvdSSFeF/zki6PtLcB5M+eGwg5AlOCdGlgHodyLeHMhhW3BZ007XJm+/lLECGkfCw8551C9cb5XksOzNdZBxVRN7poLMqDYKBD7qlsvMiyibSMbqYBJRIoqedeJG8A8VEPUiwFXPRixyv1YlG1zJ5uNs9bBrJXmJDHIJjX86ffVsYiImJqeovDjSwERPNr/FgZKTJxXTzyA8dWWogQKsyUgVJcTNn6WkOIa+qoXhKhxamvO6ZEKCRipD+9WD17X6NXvSNW5NtWXpy10K5FYprk9LzPXuLIDaGUqLpA5EedtfUtZ7Dg+S3q4FLL5q8jo54M/vFciOqJmKXYLVMd1i7csIw== huangdi_c@163.com
+
+ssh root@120.77.206.191
+ssh mangosteen@120.77.206.191
+cat ~/.ssh/id_rsa.pub
+云服务器秘钥：
+cp ./.ssh/authorized_keys /home/mangosteen/.ssh
+
+十、 搭建前端
+锁死npm版本
+npm config set save-prefix=''
+
+vue支持jsx
+pnpm i -D @vitejs/plugin-vue-jsx
+在vite.config.ts
+import vueJsx from '@vitejs/plugin-vue-jsx'
+plugin里加vueJsx(){}
+
+Editor: Detect Indentation 关掉检查文件名控制格式化格式
+
+ code ~/.bashrc  
+ alias npm='pnpm'
+ source ~/.bashrc
+ which npm
+ \npm
+
+ {
+	"Vue Component": {
+		"prefix": "vc",
+		"body": [
+			"import { defineComponent } from 'vue';",
+			"export const $1 = defineComponent({",
+			"  setup: (props, context) => {",
+			"    return () => (",
+			"      <div>$2</div>",
+			"    )",
+			"  }",
+			"})",
+		]
+	},
+	"Vue Component With Props": {
+		"prefix": "vcp",
+		"body": [
+			"import { defineComponent, PropType } from 'vue';",
+			"export const $1 = defineComponent({",
+			"  props: {",
+			"    name: {",
+			"      type: String as PropType<string>",
+			"    }",
+			"  },",
+			"  setup: (props, context) => {",
+			"    return () => (",
+			"      <div>$2</div>",
+			"    )",
+			"  }",
+			"})",
+		]
+	},
+	"Vue Component With Props and Styles": {
+		"prefix": "vcps",
+		"body": [
+			"import { defineComponent, PropType } from 'vue';",
+			"import s from './$1.module.scss';",
+			"export const $1 = defineComponent({",
+			"  props: {",
+			"    name: {",
+			"      type: String as PropType<string>",
+			"    }",
+			"  },",
+			"  setup: (props, context) => {",
+			"    return () => (",
+			"      <div class={s.wrapper}>$2</div>",
+			"    )",
+			"  }",
+			"})",
+		]
+	},
+	"Import Module SCSS": {
+		"prefix": "ims",
+		"body": [
+			"import s from './$1.module.scss';",
+		]
+	}
+}
+
+修复上一次提交
+git commit -m '使用tsx代替template，引入vueRouter4' --amend
+
+十一、 页面划分和布局
+前端也可以设计 RESTful API
+
+如何排期？
+越细越好
+留好 buffer： 你预估的时间乘以 1.2 < n < 3.14
+
+ctrl x 删除整行
+
+路由的component写成了components，黄豆流汗。
+
+cloc 统计代码量，tokei
+cloc --vcs=git
+toe .
+取色工具，微软官方最强工具PowerToys
+
+十二、 在手机调试
+
+git提交规范：
+feat - 新功能 feature
+fix - 修复 bug
+docs - 文档注释
+style - 代码格式(不影响代码运行的变动)
+refactor - 重构、优化(既不增加新功能，也不是修复bug)
+perf - 性能优化
+test - 增加测试
+chore - 构建过程或辅助工具的变动
+revert - 回退
+build - 打包
+
+底部可能会被缩放，看看淘宝怎么做。
+position：fixed
+left：0  //fixed完记得加
+bottom：0
+
+http://debugxweb.qq.com/?inspector=true 微信浏览器调试
+http://192.168.1.2:3000
+
+十三、 山竹记账12-组件封装与插槽
+
+十四、 动画、SVG Sprites 与滑动手势
+
+vite-plugin-svg-icon，iconfont
+插件运行在浏览器还是node？node
+
+svg Sprites: 先装svgo，svgstore
+写svgstore.js(webpack-loader)
+/* eslint-disable */
+import path from 'path'
+import fs from 'fs'
+import store from 'svgstore' // 用于制作 SVG Sprites
+import { optimize } from 'svgo' // 用于优化 SVG 文件
+
+export const svgstore = (options = {}) => {
+  const inputFolder = options.inputFolder || 'src/assets/icons';
+  return {
+    name: 'svgstore',
+    resolveId(id) {
+      // @svgstore 兼容vscode
+      if (id === '@svgstore') {
+        return 'svg_bundle.js'
+      }
+    },
+    load(id) {
+      if (id === 'svg_bundle.js') {
+        const sprites = store(options);
+        const iconsDir = path.resolve(inputFolder);
+        for (const file of fs.readdirSync(iconsDir)) {
+          const filepath = path.join(iconsDir, file);
+          const svgid = path.parse(file).name
+          let code = fs.readFileSync(filepath, { encoding: 'utf-8' });
+          sprites.add(svgid, code)
+        }
+        const { data: code } = optimize(sprites.toString({ inline: options.inline }), {
+          plugins: [
+            'cleanupAttrs', 'removeDoctype', 'removeComments', 'removeTitle', 'removeDesc', 
+            'removeEmptyAttrs',
+            { name: "removeAttrs", params: { attrs: "(data-name|data-xxx)" } }
+          ]
+        })
+        return `const div = document.createElement('div')
+div.innerHTML = \`${code}\`
+const svg = div.getElementsByTagName('svg')[0]
+if (svg) {
+  svg.style.position = 'absolute'
+  svg.style.width = 0
+  svg.style.height = 0
+  svg.style.overflow = 'hidden'
+  svg.setAttribute("aria-hidden", "true")
+}
+// listen dom ready event
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.body.firstChild) {
+    document.body.insertBefore(div, document.body.firstChild)
+  } else {
+    document.body.appendChild(div)
+  }
+})`
+      }
+    }
+  }
+}
+
+
+三年一下程序员不会重构= =能跑就行，重构费时费力
+git show #id  //展示变化
+git reset --hard HEAD //重置
+git format-match -1 #id//git patch
+git am < file.patch
+git diff //查看差别文件
+
+vue router animation 动画
+
+adobe XD 导出图片svg
+
+十五、 重构与类型体操
+对比业界开源库
+lodash，一个一致性、模块化、高性能的 JavaScript 实用工具库。
+underscore
+pnpm i underscore @types/underscore
+
+十六、 业务与轮子的关系
+inheritAttrs: false  不继承属性
+大公司晋升秘笈：
+1. 学新开源轮子
+2. 用
+3. 发现不适合公司业务的地方
+4. 缝合出一套适合的
+5. 宣扬开源轮子的弊端
+6. 推广
+7. 晋升
+8. 回到1
+
+移动icon
+mv /workspaces/oh-my-env/temp/*.svg src/assets/icons
+
+十七、 Narbar 与 Overlay 组件
+巨坑：ref容易忘记写value
+
+十八、 使用 v-model 实现 Tabs 组件
+<MainLayout>后面加空格会渲染不了,插槽slot不能加空格。子组件可以
+
+选中下面加横条
+&.selected {
+        position: relative;
+        &::after {
+          content: "";
+          display: block;
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 4px;
+          background: var(--tabs-indicator-bg);
+        }
+      }
+
+十九、 使用 Vant UI 制作数字按键
+二十、 自定义表单组件
+中间开发前端项目。
+
+
+二十九、 用 Rails Mailer 和 QQ邮箱发邮件
+
+后端代码：https://github.com/FrankFang/OEzuTHAqbftv/commits/master
+
+拿到代码后，你可能需要重新创建密钥：https://docs.qq.com/doc/DU3ByQXZWbFpQRHND 。这一步是可选的，但如果你遇到 ActiveSupport::MessageEncryptor::InvalidMessage 报错，那么你就必须重新创建密钥了。
+
+添加密码的命令是什么？
+EDITOR="code --wait" bin/rails credentials:edit
+在新文件中写入 email_password: xxx，
+然后在 Rails 中使用 Rails.application.credentials.email_password 获取对应的值。
+
+三十、 【山竹记账后端】文档撰写与排期
+
+有人用 Word 写
+有人用 Excel 写
+有人用 Axure 写
+有人用「原型图」写
+我们用「用例图」写
+
+估计工时尽量悲观，留出弹性时间。
+dbdiagram.io 可以画数据库的图
+
+三十一、 测试驱动开发与 API 文档
+
+时序图整理思路
+
+TDD 测试驱动开发
+
+npx http-server .
+
+解决响应体json问题：
+rspec_api_documentation 目录不存在
+解决办法：
+
+在 VSCode 中打开终端（确保当前目录为项目的根目录）
+运行 git clone https://github.com/FrankFang/hTAhuOU4I2QH /tmp/x
+运行 rm ./vendor/rspec_api_documentation; cp -r /tmp/x/vendor/rspec_api_documentation ./vendor/
+
+三十二、 mock、order、enum 等知识点
+
+单元测试： 一次只测一个函数或api
+
+reload! 重新加载控制台
+ValidationCode.destroy_all 清空数据库
+ValidationCode.count
+
+render status: :too_many_requests 容易少写冒号：变成
+render status :too_many_requests 
+
+把 controller 的逻辑拆分到 model 层的钩子中，感觉会增大排查业务逻辑时的难度，实际业务中会这么拆吗？
+rails 的约定是对于模棱两可的情况， controller 代码尽量少，model 可以尽量多一点
+另一个建议是：可读性优先。
+
+三十三、 JWT 的定义与用法
+
+建议阅读：你会做WEB上的用户登录功能吗？
+
+S = 加密(私钥，base64(header)，base64(body))
+header.payload(body).signature
+const token = base64urlEncoding(header) + '.' + base64urlEncoding(payload) + '.' + base64urlEncoding(signature)
+
+JWT存到localStorage里，配置axios在header带JWT。auth，cookie是用http的
+
+三十四、 后端如何实现 JWT
+
+gem 'jwt'
+
+三十五、 中间件与鉴权
+
+中间件。middleware，类
+lib是自己写的，ventor是别人写的
+
+# 具体测试某个用例
+bundle exec xxx 运行指定版本库
+rspec -e "登录后成功获取"  
+或者：rspec 文件名:行数
+bundle exec rspec spec/requests/items_spec.rb:17
+
+# 生成api文档
+bin/rake docs:generate 
+
+三十六、 JWT 续期与 Refresh Token
+
+jwt 时间短，使用频率高，有标准，不安全，容易被盗。
+refresh jwt 时间长，使用频率低，自己控制
+
+三十七、 超快速实现后端接口
+
+get /api/v1/tags
+1. 创建 model 运行 db：migrate
+2. 创建 controller 
+3. 写测试
+4. 写代码
+5. 写文档
+
+schema.rb 查看有哪些表
+尽量不用外键，经验之谈
+
+测试代码尽量简单，不封装，一句话只执行一个东西
+
+三十八、 migration、自定义校验、ISO8601 等
+bin/rails g migration AddKindToItem
+bin/rails db:migrate
+
+Item.create! !表示有错误报错
+
+三十九、 给统计数据分组
+bin/rails routes
+a <=> b ruby spaceship operator 比较符号 return -1,0,1 ; a<b -1
+grous.sort! !排序自身
+
+四十、 部署应用和文档
+由于 pack_for_remote.sh 更新了，所以你第一次部署到生产环境时，一定要加 need_migrate=1 前缀，如下：
+
+need_migrate=1 bin/pack_for_remote.sh
+加了 need_migrate=1 就会 migrate 数据库，不加就不会 migrate 数据库！切记！
+
+curl -v --data "email=junhuangc@foxmail.com" http://120.77.206.191:3000/api/v1/validation_codes
+API文档：http://120.77.206.191:8080
+
+bin/pack_for_remote.sh
+
+四十一、 前后端联调
+
+一般前端只需要设置content-type。
+pnpm i axios
+EDITOR="code --wait" bin/rails credentials:edit --environment production
+email_password: blndxslrdewddgjf
+hmac_secret: 8f3fbf93-e499-4843-b77e-4bff71b0426d
+
+父调子组件
+子 context.expose({hash})
+父 ref.value.api
+
+四十二、 Axios 封装
+
+TS, Record<string,string> 表示对象，Omit<a,b> 从a中删除b类型
+
+throw error
+return Promise.reject(error)
+二选一
+不能 return error 这表示没有错误
+
+四十三、 前后端联调2
+
+云服务器看log
+docker exec -it {name} bash 
+tail -f log/production.log
+
+ActivelModel-不在 ActiveRecord-数据库
+
+typo 文稿小错误
+
+四十四、 登录鉴权与路由守卫
+
+localstorage，queryString不会随着页面刷新清空，vuex和pinia会。
+
+程序员最难的三件事：
+1. +1
+2. 命名
+3. 缓存失效
+是否要refreshMe.then
+
+四十五、 自制纯前端 Mock 系统
+
+工程师不问为什么，只想怎么办
+APIFox，PostMan?
+用TS写
+
+四十六、 用 Hooks 封装业务逻辑
+
+KISS,KEEP IT SIMPLE STUPID
+
+四十七、 Ref 与 Reactive
+
+server: {
+    proxy: {
+      '/api/v1': {
+        target: 'http://120.77.206.191:3000/',
+        
+      }
+    }
+  }
+
+四十八、 Axios实践之标签请求
+
+onDelete(),onDelete(true)
+参数尽量不用bool
+
+四十九、 Axios实践之记账页面
+
+ts的string，JS的String
+toFixed 有坑 四舍六入五取偶
+
+五十、 Axios实践之可视化图表
+
+ref，神奇的bug，此变量是否显示在页面，是则ref。但chart不能ref，导致不显示浮框
+npx prettier -w '**/*.tsx' 格式化全部tsx代码
+git diff -w 对比时不看空格
+
+setting json ，"editor.rulers": [80,120,160],屏幕显示线
+
+一天有86400s
+new Array(n).fill(0),Array.from({length: n}),_占位；shift()弹出数组第一项
+
+junhuangc@foxmail.com
+
+五十一、 整体 Review
+
+优化：
+创建标签时span会改变
+没有更多下面加16px
+自定义时间，校验，时间反了怎么办？差距太大太小怎么办？
+
+记一笔的时候不传tags_id居然也可以？
+
+pnpm info vite version
+
+const onSignOut = async () => {
+      await Dialog.confirm({
+        title: '确认',
+        message: '你真的要退出登录吗？',
+      })
+      localStorage.removeItem('jwt')
+      location.reload()  //应该刷新一下页面
+    }
+
+五十二、 后端改bug
+
+bin/rails g migration AddKindToTags
+RenameTagsIdToTagIds
+RemoveDefaultValueOfKind
+addDeletedAtForItems
+bin/rails db:migrate
+
+接口加字段。
+
+引入工厂，事务transactions
+在 if 语句中操作数据库并不一定会带来风险，但取决于具体的使用情境和业务逻辑。以下是一些需要考虑的因素：
+
+并发操作： 如果多个请求同时修改数据库，可能会引发并发冲突。在某些情况下，事务可能是更好的选择，以确保一系列数据库操作的原子性。
+
+异常处理： 如果在 if 语句中的某个分支中发生异常，数据库操作可能不会被回滚，这可能导致数据不一致。在这种情况下，使用事务可以更好地处理异常，并保持数据库的一致性。
+
+事务的原子性： 如果业务逻辑涉及多个数据库操作，且这些操作应该作为一个原子操作执行（要么全部成功，要么全部失败），使用事务是更安全的选择。
+
+五十三、 前后端再度联调
+
+api/v1/tags bug
+在name栏选择请求，copy as cURL(bash)
+
+# payload_rt = JWT.decode refresh_token, Rails.application.credentials.hmac_secret, true, { algorithm: "HS256" } 
+
+psql -U mangosteen -d mangosteen_production
+\l
+\c name 
+select * from tags;
+delete from tags where id = 6;
+
+删除文档git缓存
+git rm -r --cached doc/api
+
+五十四、 Pinia 的使用与注意事项
+
+组件如果不是父子，则不能使用props，emit。
+而是provide，inject。React则是context，usecontext
+
+vue可以export ref。React不能export useState
+
+why should I use Pinia？
+服务器，跨请求状态污染
+
+pnpm i Pinia
+React 用 Zustand？
+
+五十五、 继续改 BUG
+
+自己的router.back会被守卫（history？，浏览器的不会
+
+五十六、 前端部署！
+
+注意build base 不会404即可
+
+chmod +x name
+
+跨域规则，后面斜杠要删
+
+oss上传：bin/ossutil64 cp -r dis oss://mangosteen-test-3
+-ru u是update
+
+http://120.77.206.191:8080
+http://120.77.206.191:8080/apidoc
+
+五十七、 Axios跨域的两种解决办法
+
+cat ~/.ssh/id_rsa.pub
+git remote add gitlab xxx 
+git push gitlab master
+
+1. nginx转发8080的/api/v1到3000
+cat /etc/nginx/conf.d/default.conf
+docker exec -it [容器名称或ID] find / -name "*error.log*"
+find /var/log/nginx/ -name "*.log*"
+
+2. 跨域
+
+五十八，五十九、Bug 性能优化：加载效率提升 2000%！
+
+git clone git@github.com:cajohan/mangosteen-1-page.git
+
+1. 动态 import 
+2. rollup chunk 优化
+3. 条件打包
+
+六十、 总结
+
+优化：
+1. 没有激活的icon应该置灰
+2. 切换回来应该有kind=income，pinia记住，useUserPrefer，统计图标记住选择，自定义时间
+3. 统计时间问题
+
+sign_in?preview=yes
+
+工作量多：请求多，动画多
+搭建，多做组件。
+商定文档
+开发
+测试 
+改bug
+
+后端：RESTFul，从零开始搭建，单元测试，一键部署，Docker容器化（app,nginx(api文档，前端代码),psql），完整的文档，测试驱动开发，JWT登录，中间件实现。
+前端：Vite3（2-3升级）、Vue3，TSX（主动，探索），Pinia，css module，组件封装，插槽，v-model。Vue Router鉴权守卫，Vite插件，svg Sprites，动画，手势，Vant UI，表单验证，Mock，可视化，JWT，联调，Axios封装。
+css module和scope哪个好？svg Sprites？
+
+
+
+CSS Modules 和模板作用域（Template Scope）都是用于控制样式作用范围的技术，但它们的实现方式和应用场景有所不同。
+CSS Modules:
+作用： CSS Modules 旨在解决全局样式污染的问题，将样式局部化，确保每个组件或模块的样式不会影响其他组件。
+
+命名空间： 使用 CSS Modules，每个样式文件都被视为一个独立的模块，其中的类名会被自动转换为具有唯一性的哈希值，从而创建一个私有的命名空间。
+
+导入和使用： 在 JavaScript 或 TypeScript 文件中，通过导入样式模块并将其分配给组件的类名，以在特定组件中使用样式。
+
+jsx
+Copy code
+import styles from './mystyle.module.css';
+
+function MyComponent() {
+  return <div className={styles.myClass}>Content</div>;
+}
+模板作用域（Template Scope）：
+作用： 模板作用域通常用于 Vue.js 或类似的组件框架中，以确保模板中的样式仅对当前组件有效。
+
+限定范围： 在使用模板作用域时，样式只应用于当前组件的模板，不会泄漏到其他组件。
+
+语法： 在 Vue.js 中，可以使用 <style scoped> 标签来声明模板作用域样式。
+
+html
+Copy code
+<template>
+  <div class="my-component">Content</div>
+</template>
+
+<style scoped>
+.my-component {
+  color: red;
+}
+</style>
+总体比较：
+CSS Modules 更加通用，可以在任何 JavaScript 或 TypeScript 环境中使用，而模板作用域更专注于特定的组件框架（如 Vue.js）。
+每种技术都有其适用的场景，取决于开发者的偏好和项目的特性。
+在选择时，可以根据项目的技术栈和开发者的经验来决定使用哪种样式作用域技术。
+
+
+
+vue3，比React方便，性能好，好用。快速。
+
+2762 ts
+
+六十一、 后续优化？
+
+这样是可以的：
+scp -r log/cv mangosteen@120.77.206.191:/home/mangosteen/deploys/20231123-232146/api
+http://120.77.206.191:8080/apidoc/cv/index.html
+只是每次都手动上传的话也太烦了。
+尝试自动：
+试着CRM，一次成功，成就感又来了。
+添加变量：cv_dir=$current_dir/../log/cv
+添加上传目录：scp -r $cv_dir $user@$ip:$deploy_dir/
+添加nginx配置：-v /home/$user/deploys/$version/cv:/usr/share/nginx/html/cv \
+直接访问：120.77.206.191:8080/cv/
+
+日期校验（选做）
+长按图标调整？前端调整了，后端怎么调？
+切换tabs默认选中第一个，这个前端就能做。
+
+http://120.77.206.191:8080/#/sign_in?preview=yes
+bug感觉改得差不多了。2023/11/23，历时23天？

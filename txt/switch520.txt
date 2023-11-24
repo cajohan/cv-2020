@@ -1,0 +1,87 @@
+解压密码:laoquzhang.com
+
+激活码：769171 只狼
+
+先看教程：解压后安装游戏 安装完毕后,把EMPRESS文件夹里面的文件全部复制到游戏根目录即可 3秒就能搞定 大表哥
+
+解压密码:switch520
+
+解压密码:laoquzhang.com
+
+解压密码：xxxxx520.com
+
+解压密码-记得把后面的中文也复制进去：xxxxx520.cam勿信盗卖盗链,防止被骗
+
+中文设置:C:\Users\用户名\AppData\Roaming\Goldberg SteamEmu Saves\settings文件夹下的language.txt文件修改里面内容为schinese，保存，再次进入游戏搞定”
+
+统一解压密码:switch520.com或者解压码:783324 魂1重制版
+
+解压密码：zod@Dream   [建议直接复制，不要自己输入]
+
+cmdw.top
+
+
+UI快捷键1.85C公共版
+链接：https://pan.baidu.com/s/1-jbOOL2xGdk5_fLdA7h6hg
+
+使用视频教程演示
+链接：https://pan.baidu.com/s/1vD1cTgN0_AXJJUSfatJgrw?pwd=7b0i
+解压密码（视频及快捷菜单）：eudaemonia@zodgame
+
+其他选下文件
+
+MMD舞台（1.85B mmd菜单舞台切换必须，非必要可选下载）
+链接：https://pan.baidu.com/s/1pxSuU1lNpPH9R5fhACCgjA?pwd=dly0
+
+场景包下载地址（非必要可选下载）
+链接：https://pan.baidu.com/s/1shlG6qKKLQ6vvrMSKvP3Gg?pwd=vpox
+
+提取码：te2s
+解压密码：eudaemonia@zodgame
+
+
+其他选下文件解压密码：klphgz
+
+因为考虑的是傻瓜式加载，所以跳过了加载插件的步骤，直接设置的默认Session Plugins插件预设，所以安装前请先看清楚了，如果你不想覆盖你的Session Plugins默认预设，请先备份，或者自行修改 Custom-PluginPresets 目录下的Plugins_UserDefaults的名字，然后需要加载的时候再手动加载。
+
+若不需要加载本插件时，也可以直接去编辑-Session Plugins-移除或者关闭UIAassist
+
+安装方法：
+解压后把文件夹里面的AddonPackages Custom Saves三个目录拷贝游戏根目录即可
+
+快速卸载办法：先把之前安装的版本解压放在另外一个文件夹，然后按照安装的方法剪切覆盖到游戏根目录，然后按Ctrl+Z，就会撤销你的移动，同时被覆盖的文件也不会恢复了，等于快速删除所有该版本的文件。
+
+彻底移除方法：
+1.移除AddonPackages文件夹里面的 Uiassist快捷菜单 目录
+2.移除Custom文件夹
+Assets的LUT目录及colorcorrect.assetbundle
+Atom-Person 里面的对应预设
+PluginPresets 的 Plugins_UserDefaults
+SubScene 的Lee及MonsterShinkai目录
+3.移除Save-PluginData-JayJayWon里的UIAssist目录
+
+ --locale=zh_CN pbe 汉化
+nimaboRIOT111
+ e@uw7lJJo&A2HxUr
+
+ 底特律：化身为人
+激活码：485491
+天翼高速：https://cloud.189.cn/t/uIRjay7NfMRj
+百度网盘：https://pan.baidu.com/s/1K66_2xFedVCsOWC9TmuVcA
+提取码：5tpm
+（下载前请关闭电脑防火墙跟杀毒软件，避免误杀导致重下！）
+
+奥日 
+森林
+统一解压密码:switch520.com或者解压码443546
+天翼：https://cloud.189.cn/t/iuuiQ3VZjium
+百度：https://pan.baidu.com/s/1oflkRAwcj-OalFwFI9cDkA?pwd=iao7
+提取码：iao7 
+鬼火意志
+统一解压密码:switch520.com或者解压码466222
+天翼：https://cloud.189.cn/t/UVbiYnJjMBze
+百度：https://pan.baidu.com/s/1DWx-BjrZUrgbgqjE5m0Amw?pwd=11uj
+提取码：11uj
+
+星铁：iex(irm  'https://img.lelaer.com/srcn.ps1')
+原神：iex(irm  'https://img.lelaer.com/gf.ps1')

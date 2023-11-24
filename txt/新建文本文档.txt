@@ -1,0 +1,38 @@
+解决方法：
+1.在启用或关闭windows功能中打开hyper-v（这是windows自带的虚拟机）
+2.cmd键入netsh winsock reset后Restart Docker即可
+
+cd “C:\Program Files\Docker\Docker”
+./DockerCli.exe -SwitchDaemon
+
+去 windows 终端运行 docker pull frankfang128/oh-my-docker:mangosteen 再来
+
+fzf: 查找
+f打开文件,fd打开目录,j（打开打开过的目录）
+
+
+翠黛峰-数春峰
+购买：行远，片叶，青山自酌，雁来中， X1；浮山肖 X2；
+制作： 庭中朝暮，夜观七宿， X1； 御伽木x本路灯 X8；随车致雨，信步前林 X2；
+d1xhrf0qmvurrp.cloudfront.net/CPatch/Release.7z
+https://d1xhrf0qmvurrp.cloudfront.net/ctools/Release.7z
+
+996?晚上九点睡到早上九点，一天工作六个小时。
+琴？10mins before breakfast
+
+git提交规范：
+feat - 新功能 feature
+fix - 修复 bug
+docs - 文档注释
+style - 代码格式(不影响代码运行的变动)
+refactor - 重构、优化(既不增加新功能，也不是修复bug)
+perf - 性能优化
+test - 增加测试
+chore - 构建过程或辅助工具的变动
+revert - 回退
+build - 打包
+wip - 正在实现
+
+border: 5px solid red;
+
+4566,6415,4321,6451,4536251,15634125,4321,1645

@@ -1,0 +1,24 @@
+npm config set registry https://registry.npm.taobao.org
+
+git config --global user.name 你的英文名
+git config --global user.email 你的邮箱
+git config --global push.default simple
+git config --global core.quotepath false
+git config --global core.editor "code --wait"
+git config --global core.autocrlf input
+
+ssh-keygen -t rsa -b 4096 -C 你的邮箱
+cat ~/.ssh/id_rsa.pub                           # 得到公钥内容
+ssh -T git@github.com
+
+touch ~/.bashrc
+echo 'alias ga="git add"'>> ~/.bashrc
+echo 'alias gc="git commit -v"'>> ~/.bashrc
+echo 'alias gl="git pull"'>> ~/.bashrc
+echo 'alias gp="git push"'>> ~/.bashrc
+echo 'alias gco="git checkout"'>> ~/.bashrc
+echo 'alias gst="git status -sb"'>> ~/.bashrc
+最后 code ~/.bashrc 在文件最后加上
+alias glog="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -- | less"
+
+测试

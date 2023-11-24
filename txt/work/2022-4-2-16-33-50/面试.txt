@@ -1,0 +1,27 @@
+概念题：
+1. 是什么？
+2. 做什么？
+3. 解决什么？
+4. 优缺点？
+
+区分题：
+1. 分别解释
+2. 相同点
+3. 不同点
+
+实践题：
+建议自己实践一下，然后写博客
+
+JS：
+1. 数据类型：
+6+2
+number, string, boolean, null, undefined, Object; bigint, symbol
+
+2. 原型链是什么？
+举例：一个普通对象x={}，x会有一个隐藏属性_???_，指向Object.prototype
+x._???_ === Object.prototype
+数组a=[]，会有Array.prototype,而Array.prototype也会有Object.prototype
+
+解决什么？没有class情况下继承
+
+3. this: call的第一个参数
