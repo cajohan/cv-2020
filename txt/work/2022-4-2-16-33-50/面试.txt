@@ -42,3 +42,223 @@ x._???_ === Object.prototype
   执行构造函数
   返回临时对象
 
+5. 立即执行函数，闭包，类继承，如何实现继承？
+声明之后马上执行的函数；自由变量和访问它的函数；使用原型，或者extends，construct；
+
+6. 手写节流防抖
+cd；回城被打断；应用场景，提交数据，搜索框提示？
+const throttle = (fn,time) => {
+  let flag = true
+  return (...args)=>{
+    if(!flag) {return}
+    fn.call(undefined,...args)
+    flag = false
+    setTimeout(()=>{
+      flag = true
+    },time)
+  }
+}
+// 简洁版
+const throttle = (f, time) => {
+  let timer = null
+  return (...args)=>{
+    if(timer){
+      return
+    }
+    f.call(undefined,...args)
+    timer = setTimeout(()=>{
+      timer = null
+    },time)
+  }
+}
+const debonce = (fn,time) => {
+  let timer = null
+  return (...args)=>{
+    if(timer) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(()=>{
+      fn.call(undefined,...args)
+      timer = null
+    },time)
+  }
+}
+
+7. 手写发布订阅
+设计模式，即写代码套路。
+函数首先关注输入输出。
+映射，map,表，哈希表。任务队列=>函数先进先出
+数据结构>算法
+const eventHub = {
+  queueMap: {},
+  on: (name.fn) => {
+    // 入队
+    // 防御式编程
+    eventHub.queueMap[name]=eventHub.queueMap[name]||[]
+    eventHub.queueMap[name].push(fn)
+    return undefined
+  },
+  emit: (name, data) => {
+    const q = eventHub.map[name]
+    if(!q) return
+    q.map( f => f(data))
+    return undefined
+  },
+  off: (name,fn) => {
+    // 缩写/别名。alias; 只读不写
+    const q = eventHub.map[name]
+    if(!q){ return }
+    const index = q.indexOf(fn)
+    // 短路法，少写一个else
+    if(index<0) {return}
+    q.splice(index,1)
+    return undefined
+  },
+  once: (name,fn)=>{
+    const one = (...args)=>{
+      fn(...args)
+      eventHub.off('click',fn)
+    }
+    eventHub.on('click',one)
+  }
+}
+
+eventHub.on('click',f1)
+eventHub.off('click',f1)
+
+setTimeout(()=>{
+  eventHub.emit('click','frank)
+},3000)
+
+也可以用class：
+class EventHub {
+  map = {}
+  on(name, fn) {
+    this.map[name] = this.map[name] || []
+    this.map[name].push(fn)
+  }
+  emit(name, data) {
+    const fnList = this.map[name] || []
+    fnList.forEach(fn => fn.call(undefined, data))
+  }
+  off(name, fn) {
+    const fnList = this.map[name] || []
+    const index = fnList.indexOf(fn)
+    if(index < 0) return
+    fnList.splice(index, 1)
+  }
+}
+// 使用
+const e = new EventHub()
+e.on('click', (name)=>{
+  console.log('hi '+ name)
+})
+e.on('click', (name)=>{
+  console.log('hello '+ name)
+})
+setTimeout(()=>{
+  e.emit('click', 'frank')
+},3000)
+
+8. 手写AJAX
+Axios，Jquery，VueResource， window.fetch
+封装
+
+var xhr = new XMLHttpRequest()
+
+xhr.open('GET', '/xxx')
+xhr.onload = () => {}
+xhr.onerror = () => {}
+
+// 答案
+xhr.onreadystatechage = function(){
+
+}
+xhr.send('{"name": "frank"}')
+
+const ajax = (method, url, data, success, fail) => {
+  var request = new XMLHttpRequest()
+  request.open(method, url);
+  request.onreadystatechange = function () {
+    if(request.readyState === 4) {
+      if(request.status >= 200 && request.status < 300 || request.status === 304) {
+        success(request)
+      }else{
+        fail(request)
+      }
+    }
+  };
+  request.send();
+}
+
+9. 简版Promise，Promise.all
+简版Promise:
+class Promise2 {
+  #status = 'pending'
+  constructor(fn){
+    this.q = []
+    const resolve= (data) => {
+      this.#status = 'fulfilled'
+      const f1f2 = this.q.shift()
+      if(!f1f2||!f1f2[0]) return
+      const x = f1f2[0].call(undefined,data)
+      if(x instanceof Promise2) {
+        x.then((data)=>{
+          resolve(data)
+        },(r)=>{
+          reject(r)
+        })
+      }else {
+        resolve(x)
+      }
+    }
+    const reject = (r) => {
+      this.#status = 'rejected'
+      const f1f2 = this.q.shift()
+      if(!f1f2||!f1f2[0]) return
+      const x = f1f2[1].call(undefined,data)
+      if(x instanceof Promise2) {
+        x.then((data)=>{
+          resolve(data)
+        },(r)=>{
+          reject(r)
+        })
+      }else {
+        resolve(x)
+      }
+    }
+    fn.call(undefined, resolve, reject)
+  }
+  then(f1,f2){
+    this.q.push([f1,f2])
+  }
+}
+const p = new Promise2((res,rej) => {
+  setTimeout(()=>{
+    reject('wrong')
+  },3000)
+})
+
+p.then((data)=>{console.log(data)},(r)=>{console.log(r)})
+
+Promise.all:
+1. 知道要在 Promise 上写而不是在原型上写
+2. 知道 all 的参数（Promise 数组）和返回值（新 Promise 对象）
+3. 知道用数组来记录结果
+4. 知道只要有一个 reject 就整体 reject
+Promise.myAll = function(list){
+  const results = []
+  let count = 0
+  return new Promise((res,rej)=>{
+    list.map((promise,index)=>{
+      promise.then(res=>{
+        results[index] = res
+        count += 1
+        if(count>=list.length){
+          resolve(results)
+        }
+      }.rej=>{reject(rej)})
+    })
+  })
+}
+新vue2/2；工程化/2
