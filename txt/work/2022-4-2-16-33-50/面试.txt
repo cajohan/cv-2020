@@ -468,3 +468,681 @@ v-on:input 实现了 UI ⇒ data 的单向绑定
 后者通过 template compiler 给 DOM 添加事件监听，DOM input 的值变了就会去修改 data。
 网上的博客讲得很绕，你可以尝试理解看看。
 
+23. Vue 3 押题
+a. Vue 3 为什么使用 Proxy？
+弥补 Object.defineProperty 的两个不足
+动态创建的 data 属性需要用 Vue.set 来赋值，Vue 3 用了 Proxy 就不需要了
+基于性能考虑，Vue 2 篡改了数组的 7 个 API，Vue 3 用了 Proxy 就不需要了
+defineProperty 需要提前递归地遍历 data 做到响应式，而 Proxy 可以在真正用到深层数据的时候再做响应式（惰性）
+
+b. Vue 3 为什么使用 Composition API？
+答案参考尤雨溪的博客：Vue Function-based API RFC - 知乎 (zhihu.com)
+
+Composition API 比 mixins、高阶组件、extends、Renderless Components 等更好，原因有三：
+模版中的数据来源不清晰。
+命名空间冲突。
+性能。
+更适合 TypeScript
+
+c. Vue 3 对比 Vue 2 做了哪些改动？
+官方文档写了（中文在这），这里列出几个容易被考的：
+
+createApp() 代替了 new Vue()
+v-model 代替了以前的 v-model 和 .sync
+根元素可以有不止一个元素了
+新增 Teleport 传送门
+destroyed 被改名为 unmounted 了（before 当然也改了）
+ref 属性支持函数了
+其他建议自己看看写写。
+
+24. React 押题
+a. 虚拟 DOM 的原理是什么？
+是什么
+虚拟 DOM 就是虚拟节点（这句汉化很重要）。React 用 JS 对象来模拟 DOM 节点，然后将其渲染成真实的 DOM 节点。
+
+怎么做
+第一步是模拟
+
+用 JSX 语法写出来的 div 其实就是一个虚拟节点：
+
+<div id="x">
+  <span class="red">hi</span>
+</div>
+这代码会得到这样一个对象：
+
+{
+  tag: 'div',
+  props: {
+    id: 'x'
+  },
+  children: [
+    {
+      tag: 'span',
+      props: {
+        className: 'red'
+      },
+      children: [
+        'hi'
+      ]
+    }
+  ]
+}
+能做到这一点是因为 JSX 语法会被转译为 createElement 函数调用（也叫 h 函数），如下：
+
+React.createElement("div", { id: "x"}, 
+  React.createElement("span", { class: "red" }, "hi")
+)
+第二步是将虚拟节点渲染为真实节点
+
+function render(vdom) {
+  // 如果是字符串或者数字，创建一个文本节点
+  if (typeof vdom === 'string' || typeof vdom === 'number') {
+    return document.createTextNode(vdom)
+  }
+  const { tag, props, children } = vdom
+  // 创建真实DOM
+  const element = document.createElement(tag)
+  // 设置属性
+  setProps(element, props)
+  // 遍历子节点，并获取创建真实DOM，插入到当前节点
+  children
+    .map(render)
+    .forEach(element.appendChild.bind(element))
+
+  // 虚拟 DOM 中缓存真实 DOM 节点
+  vdom.dom = element
+  
+  // 返回 DOM 节点
+  return element
+}
+
+function setProps // 略
+function setProp // 略
+
+// 作者：Shenfq
+// 链接：https://juejin.cn/post/6844903870229905422
+注意，如果节点发生变化，并不会直接把新虚拟节点渲染到真实节点，而是先经过 diff 算法得到一个 patch 再更新到真实节点上。
+
+解决了什么问题
+DOM 操作性能问题。通过虚拟 DOM 和 diff 算法减少不必要的 DOM 操作，保证性能不太差
+DOM 操作不方便问题。以前各种 DOM API 要记，现在只有 setState
+优点
+为 React 带来了跨平台能力，因为虚拟节点除了渲染为真实节点，还可以渲染为其他东西。
+让 DOM 操作的整体性能更好，能（通过 diff）减少不必要的 DOM 操作。
+缺点
+性能要求极高的地方，还是得用真实 DOM 操作（目前没遇到这种需求）
+React 为虚拟 DOM 创造了合成事件，跟原生 DOM 事件不太一样，工作中要额外注意
+所有 React 事件都绑定到根元素，自动实现事件委托
+如果混用合成事件和原生 DOM 事件，有可能会出 bug
+如何解决缺点
+不用 React，用 Vue 3（笑）
+
+b. React 或 Vue 的 DOM diff 算法是怎样的？
+是什么
+DOM diff 就是对比两棵虚拟 DOM 树的算法（废话很重要）。当组件变化时，会 render 出一个新的虚拟 DOM，diff 算法对比新旧虚拟 DOM 之后，得到一个 patch，然后 React 用 patch 来更新真实 DOM。
+
+怎么做
+首先对比两棵树的根节点
+如果根节点的类型改变了，比如 div 变成了 p，那么直接认为整棵树都变了，不再对比子节点。此时直接删除对应的真实 DOM 树，创建新的真实 DOM 树。
+如果根节点的类型没变，就看看属性变了没有
+如果没变，就保留对应的真实节点
+如果变了，就只更新该节点的属性，不重新创建节点。
+更新 style 时，如果多个 css 属性只有一个改变了，那么 React 只更新改变的。
+然后同时遍历两棵树的子节点，每个节点的对比过程同上。
+情况一
+<ul>
+  <li>A</li>
+  <li>B</li>
+</ul>
+
+<ul>
+  <li>A</li>
+  <li>B</li>
+  <li>C</li>
+</ul>
+React 依次对比 A-A、B-B、空-C，发现 C 是新增的，最终会创建真实 C 节点插入页面。
+
+情况二
+<ul>
+  <li>B</li>
+  <li>C</li>
+</ul>
+
+<ul>
+  <li>A</li>
+  <li>B</li>
+  <li>C</li>
+</ul>
+React 对比 B-A，会删除 B 文本新建 A 文本；对比 C-B，会删除 C 文本，新建 B 文本；（注意，并不是边对比边删除新建，而是把操作汇总到 patch 里再进行 DOM 操作。）对比空-C，会新建 C 文本。
+
+你会发现其实只需要创建 A 文本，保留 B 和 C 即可，为什么 React 做不到呢？
+
+因为 React 需要你加 key 才能做到：
+
+<ul>
+  <li key="b">B</li>
+  <li key="c">C</li>
+</ul>
+
+<ul>
+  <li key="a">A</li>
+  <li key="b">B</li>
+  <li key="c">C</li>
+</ul>
+React 先对比 key 发现 key 只新增了一个，于是保留 b 和 c，新建 a。
+
+以上是 React 的 diff 算法（源码分析在下一节补充视频中，时长一小时，有能力者选看）。
+
+但面试官想听的可能是 Vue 的「双端交叉对比」算法：
+
+c. 补充：React DOM diff 和 Vue DOM diff 的区别？
+先纠正之前的一个细节错误：
+
+错：我认为数组存储的是整棵树。
+
+对：其实数组存储的是拥有相同爸爸的一群子节点。
+
+
+
+React DOM diff 和 Vue DOM diff 的区别：
+
+React 是从左向右遍历对比，Vue 是双端交叉对比。
+React 需要维护三个变量（有点扯），Vue 则需要维护四个变量。
+Vue 整体效率比 React 更高，举例说明：假设有 N 个子节点，我们只是把最后子节点移到第一个，那么
+React 需要进行借助 Map 进行 key 搜索找到匹配项，然后复用节点
+Vue 会发现移动，直接复用节点
+
+
+附 React DOM diff 代码查看流程：
+
+运行 git clone https://github.com/facebook/react.git
+运行 cd react; git switch 17.0.2
+用 VSCode 或 WebStorm 打开 react 目录
+打开 packages/react-reconciler/src/ReactChildFiber.old.js 第 1274 行查看旧版代码，或打开 packages/react-reconciler/src/ReactChildFiber.new.js 第 1267 行查看新代码（实际上一样）
+忽略所有警告和报错，因为 React JS 代码中有不是 JS 的代码
+折叠所有代码
+根据 React 文档中给出的场景反复在大脑中运行代码
+场景0：单个节点，会运行到 reconcileSingleElement。接下来看多个节点的情况。
+场景1：没 key，标签名变了，最终会走到 createFiberFromElement（存疑）
+场景2：没 key，标签名没变，但是属性变了，最终走到 updateElement 里的 useFiber
+场景3：有 key，key 的顺序没变，最终走到 updateElement
+场景4：有 key，key 的顺序变了，updateSlot 返回 null，最终走到 mapRemainingChildren、updateFromMap 和 updateElement(matchedFiber)，整个过程较长，效率较低
+代码查看要点：
+声明不看（用到再看）
+if 先不看（但 if else 要看）
+函数调用必看
+必备快捷键：折叠所有、展开、向前、向后、查看定义
+
+d. React 有哪些生命周期钩子函数？数据请求放在哪个钩子里？
+总得来说：
+
+挂载时调用 constructor，更新时不调用
+更新时调用 shouldComponentUpdate 和 getSnapshotBeforeUpdate，挂载时不调用
+should... 在 render 前调用，getSnapshot... 在 render 后调用
+请求放在 componentDidMount 里，最好写博客，容易忘。
+
+e. React 如何实现组件间通信
+父子组件通信：props + 函数
+爷孙组件通信：两层父子通信或者使用 Context.Provider 和 Context.Consumer
+任意组件通信：其实就变成了状态管理了
+Redux 
+Mobx
+Recoil
+
+f. 你如何理解 Redux？
+文档第一句话背下来：Redux 是一个状态管理库/状态容器。 
+把 Redux 的核心概念说一下：
+State
+Action = type + payload 荷载
+Reducer 
+Dispatch 派发
+Middleware
+把 ReactRedux 的核心概念说一下：
+connect()(Component)
+mapStateToProps
+mapDispatchToProps
+说两个常见的中间件 redux-thunk redux-promise
+
+g. 什么是高阶组件 HOC？
+参数是组件，返回值也是组件的函数。什么都能做，所以抽象问题就具体回答。
+
+举例说明即可：
+
+React.forwardRef
+ReactRedux 的 connect
+ReactRouter 的 withRouter
+参考阅读：「react进阶」一文吃透React高阶组件(HOC) - 掘金 (juejin.cn)
+
+h. React Hooks 如何模拟组件生命周期？
+模拟 componentDidMount
+模拟 componentDidUpdate
+模拟 componentWillUnmount
+代码示例如下：
+
+import { useEffect,useState,useRef } from "react";
+import "./styles.css";
+
+export default function App() {
+  const [visible, setNextVisible] = useState(true)
+  const onClick = ()=>{
+    setNextVisible(!visible)
+  }
+  return (
+    <div className="App">
+      <h1>Hello CodeSandbox</h1>
+      {visible ? <Frank/> : null}
+      <div>
+        <button onClick={onClick}>toggle</button>
+        </div>
+     
+    </div>
+  );
+}
+
+function Frank(props){
+  const [n, setNextN] = useState(0)
+  const first = useRef(true)
+  useEffect(()=>{
+    if(first.current === true ){
+      return
+    }
+    console.log('did update')
+  })
+  useEffect(()=>{
+    console.log('did mount')
+    first.current = false
+    return ()=>{
+      console.log('did unmount')
+    }
+  }, [])
+  
+  const onClick = ()=>{
+    setNextN(n+1)
+  }
+  return (
+    <div>Frank
+      <button onClick={onClick}>+1</button>
+    </div>
+  )
+}
+完。
+
+25. Node.js 
+a. Node.js 的 EventLoop 是什么？
+Node.js 将各种函数（也叫任务或回调）分成至少 6 类，按先后顺序调用，因此将时间分为六个阶段：
+
+timers 阶段（setTimeout）
+I/O callbacks 该阶段不用管
+idle, prepare 该阶段不用管
+poll 轮询阶段，停留时间最长，可以随时离开。
+主要用来处理 I/O 事件，该阶段中 Node 会不停询问操作系统有没有文件数据、网络数据等
+如果 Node 发现有 timer 快到时间了或者有 setImmediate 任务，就会主动离开 poll 阶段
+check 阶段，主要处理 setImmediate 任务
+close callback 该阶段不用管
+Node.js 会不停的从 1 ~ 6 循环处理各种事件，这个过程叫做事件循环（Event Loop）。
+
+nextTick
+process.nextTick(fn) 的 fn 会在什么时候执行呢？
+
+在 Node.js 11 之前，会在每个阶段的末尾集中执行（俗称队尾执行）。
+
+在 Node.js 11 之后，会在每个阶段的任务间隙执行（俗称插队执行）。
+
+浏览器跟 Node.js 11 之后的情况类似。可以用 window.queueMicrotask 模拟 nextTick。
+
+Promise
+Promise.resolve(1).then(fn) 的 fn 会在什么时候执行？
+
+这要看 Promise 源码是如何实现的，一般都是用 process.nextTick(fn) 实现的，所以直接参考 nextTick。
+
+async / await 
+这是 Promise 的语法糖，所以直接转为 Promise 写法即可。
+
+面试题1：
+
+setTimeout(() => {
+  console.log('setTimeout')
+})
+
+setImmediate(() => {
+  console.log('setImmediate')
+})
+// 在 Node.js 运行会输出什么？
+// A setT setIm
+// B setIm setT
+// C 出错
+// D A 或 B
+// 在浏览器执行会怎样？
+
+
+面试题2：
+
+async function async1(){
+    console.log('1')                   // 2
+    async2().then(()=>{
+      console.log('2')
+    })
+    
+}
+async function async2(){
+    console.log('3')                   // 3
+}
+console.log('4')                        // 1
+setTimeout(function(){
+    console.log('5') 
+},0)  
+async1();
+new Promise(function(resolve){
+    console.log('6')                    // 4
+    resolve();
+}).then(function(){
+    console.log('7')
+})
+console.log('8')                           // 5  
+//4 1 3 6 8 2 7 5 
+
+b. 浏览器里的微任务和任务是什么？
+浏览器中并不存在宏任务，宏任务（Macrotask）是 Node.js 发明的术语。
+
+浏览器中只有任务（Task）和微任务（Microtask）。
+
+使用 script 标签、setTimeout 可以创建任务。
+使用 Promise#then、window.queueMicrotask、MutationObserver、Proxy 可以创建微任务。
+执行顺序是怎样的呢？
+
+微任务会在任务间隙执行（俗称插队执行）。
+
+⚠️
+注意，微任务不能插微任务的队，微任务只能插任务的队。
+// next = [0, 4x, 1, 2, 3, 5, 6]
+Promise.resolve()
+	.then(() => {
+	    console.log(0);
+	    return Promise.resolve('4x');
+	})
+	
+	.then((res) => {console.log(res)})
+	
+Promise.resolve().then(() => {console.log(1);})
+                 .then(() => {console.log(2);}, ()=>{console.log(2.1)})
+                 .then(() => {console.log(3);})
+                 .then(() => {console.log(5);})
+                 .then(() => {console.log(6);})
+
+c. express.js 和 koa.js 的区别是什么？
+中间件模型不同：express 的中间件模型为线型，而 koa 的为U型（洋葱模型）。
+对异步的处理不同：express 通过回调函数处理异步，而 koa 通过generator 和 async/await 使用同步的写法来处理异步，后者更易维护，但彼时 Node.js 对 async 的兼容性和优化并不够好，所以没有流行起来。
+功能不同：express 包含路由、渲染等特性，而 koa 只有 http 模块。
+总得来说，express 功能多一点，写法烂一点，兼容性好一点，所以当时更流行。虽然现在 Node.js 已经对 await 支持得很好了，但是 koa 已经错过了风口。
+
+不过 express 和 koa 的作者都是 TJ 大神。
+
+26. 工程化押题（webpack、vite）
+a. 常见 loader 和 plugin 有哪些？二者的区别是什么？
+你可以记住：
+
+babel-loader 把 JS/TS 变成  JS
+ts-loader 把 TS 变成 JS，并提示类型错误
+markdown-loader 把 markdown 变成 html
+html-loader 把 html 变成 JS 字符串
+sass-loader 把 SASS/SCSS 变成 CSS
+css-loader 把 CSS 变成 JS 字符串
+style-loader 把 JS 字符串变成 style 标签
+postcss-loader 把 CSS 变成更优化的 CSS
+vue-loader 把单文件组件（SFC）变成 JS 模块
+thread-loader 用于多进程打包
+
+你可以记住这些：
+
+html-webpack-plugin 用于创建 HTML 页面并自动引入 JS 和 CSS
+clean-webpack-plugin 用于清理之前打包的残余文件
+mini-css-extract-plugin 用于将 JS 中的 CSS 抽离成单独的 CSS 文件
+SplitChunksPlugin 用于代码分包（Code Split）
+DllPlugin + DllReferencePlugin 用于避免大依赖被频繁重新打包，大幅降低打包时间
+eslint-webpack-plugin 用于检查代码中的错误
+DefinePlugin 用于在 webpack config 里添加全局变量
+copy-webpack-plugin 用于拷贝静态文件到 dist
+
+二者的区别
+loader 是文件加载器（这句废话很重要）
+功能：能够对文件进行编译、优化、混淆（压缩）等，比如 babel-loader / vue-loader
+运行时机：在创建最终产物之前运行
+plugin 是 webpack 插件（这句废话也很重要）
+功能：能实现更多功能，比如定义全局变量、Code Split、加速编译等
+运行时机：在整个打包过程（以及前后）都能运行
+
+b. webpack 如何解决开发时的跨域问题？
+在开发时，我们的页面在 localhost:8080，JS 直接访问后端接口（如 https://xiedaimala.com 或 http://localhost:3000）会报跨域错误。
+
+为了解决这个问题，可以在 webpack.config.js 中添加如下配置：
+
+module.exports = {
+  //...
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://xiedaimala.com',
+        changeOrigin: true,
+      },
+    },
+  },
+};
+此时，在 JS 中请求 /api/users 就会自动被代理到 http://xiedaimala.com/api/users 。
+
+如果希望请求中的 Origin 从 8080 修改为 xiedaimala.com，可以添加 changeOrigin: true 。
+
+如果要访问的是 HTTPS API，那么就需要配置 HTTPS 证书，否则会报错。
+
+不过，如果在 target 下面添加 secure: false ，就可以不配置证书且忽略 HTTPS 报错。
+
+总之，记住常用选项就行了。
+
+c. 如何实现 tree-shaking？
+是什么
+tree-shaking 就是让没有用到的 JS 代码不打包，以减小包的体积。
+
+怎么做
+背下文档说的这几点：
+
+怎么删
+使用 ES Modules 语法（即 ES6 的 import 和 export 关键字）
+CommonJS 语法无法 tree-shaking（即 require 和 exports 语法）
+引入的时候只引用需要的模块
+要写 import {cloneDeep} from 'lodash-es' 因为方便 tree-shaking
+不要写 import _ from 'lodash' 因为会导致无法 tree-shaking 无用模块
+怎么不删：在 package.json 中配置 sideEffects，防止某些文件被删掉
+比如我 import 了 x.js，而 x.js 只是添加了 window.x 属性，那么 x.js 就要放到 sideEffects 里
+比如所有被 import 的 CSS 都要放在 sideEffects 里
+怎么开启：在 webpack config 中将 mode 设置为 production（开发环境没必要 tree-shaking）
+mode: production 给 webpack 加了非常多优化。
+
+d. 如何提高 webpack 构建速度？
+使用 DllPlugin 将不常变化的代码提前打包，并复用，如 vue、react
+使用 thread-loader 或 HappyPack（过时）进行多线程打包
+处于开发环境时，在 webpack config 中将 cache 设为 true，也可用 cache-loader（过时）
+处于生产环境时，关闭不必要的环节，比如可以关闭 source map
+网传的 HardSourceWebpackPlugin 已经一年多没更新了，谨慎使用
+
+e. webpack 与 vite 的区别是什么？
+开发环境区别
+vite 自己实现 server，不对代码打包，充分利用浏览器对 <script type=module> 的支持
+假设 main.js 引入了 vue
+该 server 会把 import { createApp } from 'vue' 改为 import { createApp } from "/node_modules/.vite/vue.js" 这样浏览器就知道去哪里找 vue.js 了
+webpack-dev-server 常使用 babel-loader 基于内存打包，比 vite 慢很多很多很多
+该 server 会把 vue.js 的代码（递归地）打包进 main.js
+生产环境区别
+vite 使用 rollup + esbuild 来打包 JS 代码
+webpack 使用 babel 来打包 JS 代码，比 esbuild 慢很多很多很多
+webpack 能使用 esbuild 吗？可以，你要自己配置（很麻烦）。
+文件处理时机
+vite 只会在你请求某个文件的时候处理该文件
+webpack 会提前打包好 main.js，等你请求的时候直接输出打包好的 JS 给你
+目前已知 vite 的缺点有：
+
+热更新常常失败，原因不清楚
+有些功能 rollup 不支持，需要自己写 rollup 插件
+不支持非现代浏览器
+
+f. webpack 怎么配置多页应用？
+这是对应的 webpack config：
+
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: {
+    app: './src/app.js',
+    admin: './src/admin.js',
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      chunks: ['app']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'admin.html',
+      chunks: ['admin']
+    })
+  ],
+};
+但是，这样配置会有一个「重复打包」的问题：假设 app.js 和 admin.js 都引入了 vue.js，那么 vue.js 的代码既会打包进 app.js，也会打包进 admin.js。我们需要使用 optimization.splitChunks 将共同依赖单独打包成 common.js（HtmlWebpackPlugin 会自动引入 common.js）。
+
+如何支持无限多页面呢？
+写点 Node.js 代码不就实现了么？
+
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const fs = require('fs')
+const path = require('path')
+
+const filenames = fs.readdirSync('./src/pages')
+  .filter(file => file.endsWith('.js'))
+  .map(file => path.basename(file, '.js'))
+
+const entries = filenames.reduce((result, name) => (
+  { ...result, [name]: `./src/pages/${name}.js` }
+), {})
+const plugins = filenames.map((name) =>
+  new HtmlWebpackPlugin({
+    filename: name + '.html',
+    chunks: [name]
+  })
+)
+
+module.exports = {
+  entry: {
+    ...entries
+  },
+  plugins: [
+    ...plugins
+  ],
+};
+
+g. swc、esbuild 是什么？
+swc
+实现语言：Rust
+
+功能：编译 JS/TS、打包 JS/TS
+
+优势：比 babel 快很多很多很多（20倍以上）
+
+能否集成进 webpack：能
+
+使用者：Next.js、Parcel、Deno、Vercel、ByteDance、Tencent、Shopify……
+
+做不到：
+
+对 TS 代码进行类型检查（用 tsc 可以）
+打包 CSS、SVG
+esbuild
+实现语言：Go
+
+功能：同上
+
+优势：比 babel 快很多很多很多很多很多很多（10~100倍）
+
+能否集成进 webpack：能
+
+使用者：vite、vuepress、snowpack、umijs、blitz.js 等
+
+做不到：
+
+对 TS 代码进行类型检查
+打包 CSS、SVG
+
+27. 非技术题
+a. 你为什么从上一家公司离职？
+原则：
+
+上一家公司对我很好
+我对上一家公司很满意
+举例：
+
+跟女朋友讨论后慎重决定去女朋友家乡所在省会发展（后来变卦、分手）
+加班到生病需要静养（不想吃空饷）
+公司倒闭、公司改组、公司转型（大批人被解雇）
+
+b. 你的缺点是什么？
+说确实存在的缺点
+说出你的改进过程
+说出你的进步程度
+
+c. 你的薪资要求是多少？
+原则：
+
+心理价位 + 2~3k
+每人只有一次报价机会，说了就不好改口，所以尽量高
+如果对方砍价，那就做出让步姿势
+如果对方不砍价，可能你还是要低了，也可能对方财大气粗
+只要过了面试，你就没有理由压我工资
+工资流水怎么办？隐私你都问，可以给，不过你要知道流水跟薪资无关，不接受压价
+没工作经验？有项目经验，而且我过了面试，说明我的能力甚至比有工作经验的还强
+如果对方报价低于预期，就收作备胎，继续面下一家
+要求我明天到岗？不好意思，目前的工作还没交接完/下周要去老家当伴郎/伴娘
+
+d. 何时可以到岗？
+错误答案：随时到岗。
+
+如果公司强烈要求你明天到岗，就一定不要去，说明是个火坑。
+
+可以接受的答案：
+
+下周三。给自己面试下一家公司留足一周时间
+最晚下个月15号。等工作交接完毕就可以了，实际上还是留时间面试下一家。
+
+e. 你对加班的看法？
+标准答案：
+
+我不赞同无效的加班、看似在加班实际上却什么都没做（我从来不划水摸鱼）
+当公司的重要项目有延期风险，那么为了保证项目如期上线是可以加班的（公司还有不重要的项目？）
+另外，我觉得更重要的是提升自己的工作效率，降低项目延期的风险（我好有责任心）
+上面的观点，无论是「支持加班」的人还是「不支持加班」的人，都无法反驳。
+
+f. 你遇到最难的 bug 是什么？
+这题主要靠你讲一个「一波三折」的故事。
+
+接下来是我的例子
+问题：Go 桌面项目打开是空白。
+
+解决办法：debug，搜索，读 issue，找到答案。
+
+怎么把这个故事讲得曲折一点？
+
+用户说页面空白，而且无法复现
+有一天我下定决心解决这个问题，于是远程协助了用户
+我在用户电脑上 debug，发现了报错原因
+但很奇怪，我的电脑不会有这个报错
+于是我上网搜索，终于发现了类似的报错
+顺腾摸瓜，发现有人有一样的报错
+爬楼，发现有个用户留言，是 Windows 注册表的问题
+于是我修改了用户的注册表，发现 bug 消除了
+我总结发现这是因为 Go 的这个 gin 库偷懒用到了注册表
+于是我向这个库作者反馈了
+并自己写博客记录了这个问题（没写博客就别说这句）
+重点：
+
+要体现你的主观能动性
+要体现你坚持不懈、念念不忘
+要体现你的责任心
+
+28. 算法
+29. 刁钻题
+30. 答题技巧
