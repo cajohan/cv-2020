@@ -1144,5 +1144,334 @@ f. 你遇到最难的 bug 是什么？
 要体现你的责任心
 
 28. 算法
+a. 大数相加
+题目
+
+const add = (a, b) => {
+  ...
+  return sum
+}
+
+console.log(add("11111111101234567","77777777707654321"))
+console.log(add("911111111101234567","77777777707654321"))
+答案
+
+const add = (a, b) => {
+  const maxLength = Math.max(a.length, b.length)
+  let overflow = false
+  let sum = ''
+  for(let i = 1; i <= maxLength; i++){
+    const ai = a[a.length-i] || '0'
+    const bi = b[b.length-i] || '0'
+    let ci = parseInt(ai) + parseInt(bi) + (overflow ? 1 : 0)
+    overflow = ci >= 10
+    ci = overflow ? ci - 10 : ci
+    sum = ci + sum 
+  }
+  sum = overflow ? '1' + sum : sum
+  return sum
+}
+
+console.log(add("11111111101234567","77777777707654321"))
+console.log(add("911111111101234567","77777777707654321"))
+15位加速版：
+
+const add = (a, b) => {
+  const maxLength = Math.max(a.length, b.length)
+  let overflow = false
+  let sum = ''
+  for(let i = 0; i < maxLength; i+=15){
+    const ai = a.substring(a.length-i -15, a.length-i) || '0'
+    const bi = b.substring(b.length-i -15, b.length-i) || '0'
+    let ci = parseInt(ai) + parseInt(bi) + (overflow ? 1 : 0)
+    overflow = ci > 999999999999999 // 15 个 9
+    ci = overflow ? ci - (999999999999999+1) : ci
+    sum = ci + sum 
+  }
+  sum = overflow ? '1' + sum : sum
+  return sum
+}
+
+console.log(add("11111111101234567","77777777707654321"))
+console.log(add("911111111101234567","77777777707654321"))
+
+const add = (a, b) => {
+  const maxLength = Math.max(a.length, b.length);
+  let overflow = 0; // 初始溢出为0
+  let sum = '';
+
+  for (let i = 0; i < maxLength || overflow; i += 15) {
+    const ai = parseInt(a.substring(a.length - i - 15, a.length - i) || '0');
+    const bi = parseInt(b.substring(b.length - i - 15, b.length - i) || '0');
+    
+    let ci = ai + bi + overflow;
+    overflow = Math.floor(ci / 1e15); // 1e15 是 15 个 0
+    ci %= 1e15;
+
+    // 将 ci 转为字符串，并在前面补0
+    const ciStr = ci.toString().padStart(15, '0');
+    
+    // 将当前结果插入到最前面
+    sum = ciStr + sum;
+  }
+
+  return sum.replace(/^0+/, '') || '0'; // 移除结果前面的0，保留至少一个0
+};
+
+// 测试
+const result = add(
+  '999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999',
+  '1'
+);
+
+console.log(result);
+
+其他思路：
+
+转为数组，然后倒序，遍历
+使用队列，使用 while 循环
+可以自行搜索。
+
+b. 两数之和
+题目
+const numbers = [2,7,11,15]
+const target = 9
+const twoSum = (numbers, target) => {
+  // ...
+}
+console.log(twoSum(numbers, target))
+// [0, 1] 或 [1, 0]
+
+// 出题者保证
+// 1. numbers 中的数字不会重复
+// 2. 只会存在一个有效答案
+答案
+const numbers = [2,7,11,15]
+const target = 9
+const twoSum = (numbers, target) => {
+  const map = {}
+  for(let i = 0; i < numbers.length; i++){
+    const number = numbers[i]
+    const number2 = target - number
+    if(number2 in map){
+      const number2Index = map[number2]
+      return [i, number2Index]
+    } else {
+      map[number] = i
+    }
+  }
+  return []
+}
+console.log(twoSum(numbers, target))
+上面是给菜鸟看的，所以有多余的中间变量，可以删掉。
+
+c. 无重复最长子串的长度
+const lengthOfLongestSubstring = (str) => {
+  //...
+}
+
+console.log(lengthOfLongestSubstring("abcabcbb"))
+// 3
+答案：滑动窗口法
+我称之为「两根手指法」。
+
+var lengthOfLongestSubstring = function(s){
+  if(s.length <= 1) return s.length
+  let max = 0
+  let p1 = 0
+  let p2 = 1
+  while(p2 < s.length) {
+    let sameIndex = -1
+    for(let i = p1; i < p2; i++){
+      if(s[i] === s[p2]){
+        sameIndex = i
+        break
+      }
+    }
+    let tempMax 
+	  if( sameIndex >= 0){
+	    tempMax = p2 - p1
+	    p1 = sameIndex + 1
+	  }else{
+	    tempMax = p2 - p1 + 1
+	  }
+	  if(tempMax > max){
+	    max = tempMax
+	  }
+    p2 += 1
+  }
+  
+  return max
+}
+gpt：
+const lengthOfLongestSubstring = function(s) {
+    let left = 0;
+    let right = 0;
+    let maxLen = 0;
+    const charIndex = {};
+
+    while (right < s.length) {
+        const currentChar = s[right];
+
+        // 如果字符在窗口中没有重复
+        if (charIndex[currentChar] === undefined || charIndex[currentChar] < left) {
+            charIndex[currentChar] = right;
+            maxLen = Math.max(maxLen, right - left + 1);
+            right++;
+        } else {
+            // 如果字符在窗口中有重复，左指针右移
+            left = charIndex[currentChar] + 1;
+        }
+    }
+
+    return maxLen;
+};
+使用 map 加速：
+
+var lengthOfLongestSubstring = function(s) {
+  if (s.length <= 1)
+    return s.length
+  let max = 0
+  let p1 = 0
+  let p2 = 1
+  const map = {}
+  map[s[p1]] = 0
+  while (p2 < s.length) {
+    let hasSame = false
+    if(s[p2] in map){
+      hasSame = true
+      if(map[s[p2]] >= p1){
+          p1 = map[s[p2]] + 1
+      }
+    }
+    map[s[p2]] = p2
+    let tempMax = p2 - p1 + 1
+    if(tempMax > max) max = tempMax
+    p2 += 1
+  }
+  return max
+};
+你会发现，加速失败，可能是 JS 的问题。
+
+改用 new Map() 试试：
+
+var lengthOfLongestSubstring = function(s) {
+  if (s.length <= 1)
+    return s.length
+  let max = 0
+  let p1 = 0
+  let p2 = 1
+  const map = new Map()
+  map.set(s[p1], 0)
+  while (p2 < s.length) {
+    let hasSame = false
+    if(map.has(s[p2])){
+      hasSame = true
+      if(map.get(s[p2]) >= p1){
+          p1 = map.get(s[p2]) + 1
+      }
+    }
+    map.set(s[p2],p2)
+    let tempMax = p2 - p1 + 1
+    if(tempMax > max) max = tempMax
+    p2 += 1
+  }
+  return max
+};
+你会发现，加速失败，这应该还是 JS 的问题。
+
 29. 刁钻题
+a. [1,2,3].map(parseInt)
+[1,2,3].map(parseInt)
+// 展开
+parseInt(1, 0, arr) => parseInt(1) => 1
+parseInt(2, 1, arr) => NaN
+parseInt(3, 2, arr) => NaN
+正确写法
+
+[1,2,3].map((number)=> parseInt(number) )
+
+b. a.x = a = {}
+var a = {x: #505}; // 地址 #404
+var b = a; // b = #404
+a.x = a = {x: 2}; // #505
+// #404.x = a = #505
+// #404.x = #505
+// b.x = {x: 2}
+console.log(a.x) // 2
+console.log(b.x) // 1
+// 答案自己在浏览器运行
+这题真变态。
+
+c. if true / function a / a = 2
+var a = 0;
+if (true) {
+    a = 1;
+    function a() {return 3}
+    a = 2;
+    console.log(a); // 2
+}
+console.log(a); // 1
+这题属于未定义行为（见 MDN），实在刁钻，答案并不唯一。但你可以回答「打印 2 和 1」。
+
+Chrome / Edge 运行结果：2、1
+
+
+Safari 运行结果：2、2
+
+
+Firefox 运行结果：2、1
+
+
 30. 答题技巧
+抽象问题答具体，具体问题可抽象
+举例一：
+
+你如何理解设计模式？
+你应该把问题转变成
+
+我是如何理解发布订阅模式、工厂模式、builder 模式的
+举例二：
+
+你平时是如何学习编程的？
+你说完看书、看博客、看视频和逛论坛是不是就没得说了？可以抽象一点，比如
+
+我主要通过「输入」、「转化」和「输出」来学习。
+「输入」是指阅读别人分享的知识，比如看博客、看书。
+「转化」是指把知识消化之后变成自己的积累，用自己的知识体系重新阐述一遍新学的概念。
+「输出」是指把自己的理解以博客、视频的形式分享给别人。
+学会「总-分-总」叙事
+听到问题之后，如果觉得问题很复杂，可以先跟面试官确认一下：
+
+你问的是 XXX 吗？
+目的有二：
+
+确保自己不要偏题
+留给自己一些时间组织语言
+然后你可以用这句话开头：
+
+我觉得这个问题可以从两方面考虑
+一是……
+二是……
+如果你说着说着发现新的点，可以接着说
+
+对了，还有一点可以补充……
+最后你可以结尾：
+
+我平时就是从这三点来解决类似问题的
+这就是「总-分-总」，这种叙事的好处是让你显得思路清晰。
+
+学会放弃，加个但是
+如果某个知识点你完全不会，可以直接说「没接触过」。
+
+但是，你一定要加一个「但是」或者「因为」：
+
+因为我平时主要关注的是 XXX 方向，所以你能不能问这个方向的题目呢？
+强行把话题转向自己擅长的领域。
+
+如果你没有擅长的领域，就当我没说……
+
+不要冷场超过三秒钟
+听完题目如果没思路千万不要闷头想，这样会让气氛变得非常焦灼。
+
+想不到说什么可以向面试官确认或者求面试官给提示。
