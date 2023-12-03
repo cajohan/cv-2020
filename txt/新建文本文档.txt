@@ -43,3 +43,5 @@ border: 5px solid red;
 云服务器和域名挂钩？
 如果是云服务器，自己摸索了一下，很难搞。如果下周末有空，下周末照着别人的oss思路来搞吧还是。
 ..突然发现是阿里云没配置好解析和安全组的问题，可以https了，我晕。
+chrome会报 Mixed Content: The page at 'https://www.chenjunhuang.top/#/sign_in?preview=yes' was loaded over HTTPS, but requested an insecure XMLHttpRequest endpoint 'http://120.77.206.191:3000/api/v1/session'. This request has been blocked; the content must be served over HTTPS.
+前端http://120.77.206.191:3000/api/v1改成https://www.chenjunhuang.top/api/v1，解决。
