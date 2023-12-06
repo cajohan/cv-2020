@@ -1,0 +1,57 @@
+节流
+const throttle = (fn,time)=>{
+  let timer = null
+  return (...args)=>{
+    if(timer) return
+    fn(...args)
+    timer = setTimeout(()=>{
+      timer = null
+    },time)
+  }
+}
+
+防抖
+const debounce = (fn,time)=>{
+  let timer = null
+  return (...args)=>{
+    clearTimeout(timer)
+    timer = setTimeout(()=>{
+      fn(...args)
+    },time)
+  }
+}
+
+自我介绍
+面试官您好，我叫xxx，毕业于xxx学校xxx专业，本科学历。我在上一份工作中主要负责小程序和H5的开发，使用Taro+React技术栈，参与了三款微信小程序的开发、维护与发版，同时也负责了项目中的前端H5部分。在项目中，我曾面临过挑战，比如...，我通过...的方式成功解决了这个问题。
+
+此外，我熟悉Vue，最近的个人项目使用Vue+TSX完成。我还取得了大学英语六级证书，具备良好的英语读写能力。在业余时间，我有写技术博客的习惯，主要在知乎更新，曾分享过关于使用webstorm的经验，阅读量数万。我认为自己是一个对技术充满热情、有着丰富前端经验的人，期待能够为贵公司做出更多贡献。谢谢！
+
+React常用的hooks？
+useState，useEffect，useRef，useContext
+useMemo:
+用于记忆计算值，避免在每次渲染时重新计算。
+useRef:
+用于获取 DOM 元素或保存可变值。
+useReducer:
+用于在组件中使用复杂的状态逻辑。
+useCallback：
+用于记忆回调函数，防止函数在每次渲染时重新创建。
+
+XSS和CSRF？
+XSS（Cross Site Script），指跨站脚本攻击。
+攻击者脚本 嵌入 被攻击网站，获取用户cookie等隐私信息。
+CSRF(Cross Site Request Forgery)指的是跨站请求伪造，是一种劫持受信任用户向服务器发送非预期请求的攻击方式。跨域指的是请求来源于其他网站，伪造指的是非用户自身的意愿。
+已登录用户 访问 攻击者网站，攻击网站向被攻击网站发起恶意请求（利用浏览器会自动携带cookie）。
+
+父组件更新了，子组件没更新，子组件会重新渲染吗？
+正常是不会的，通过VDOM比较有变动才更新。
+
+在前端路由中，有两种常见的模式：Hash 模式和History 模式。
+Hash 模式：
+实现方式： 在 URL 中使用哈希（#）来管理路由，例如 http://example.com/#/path。
+优点： 兼容性好，因为哈希部分不会被发送到服务器，不会触发页面重新加载。
+缺点： 带有 # 符号，不够美观；同时，前端获取路由需要通过监听 hashchange 事件等方式。
+History 模式：
+实现方式： 利用 HTML5 的 History API，通过 pushState 和 replaceState 可以在不重新加载页面的情况下改变 URL。
+优点： URL 更美观，不带 # 符号；前端路由使用起来更像传统的后端路由。
+缺点： 兼容性较差，不支持的浏览器需要有备用方案；需要服务器的支持，以避免在刷新页面或直接访问 URL 时返回 404。
