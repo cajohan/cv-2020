@@ -55,3 +55,34 @@ History 模式：
 实现方式： 利用 HTML5 的 History API，通过 pushState 和 replaceState 可以在不重新加载页面的情况下改变 URL。
 优点： URL 更美观，不带 # 符号；前端路由使用起来更像传统的后端路由。
 缺点： 兼容性较差，不支持的浏览器需要有备用方案；需要服务器的支持，以避免在刷新页面或直接访问 URL 时返回 404。
+
+Axios怎么封装的？
+TS泛型体操，Axios怎么写返回的参数。
+type GetConfig = Omit<AxiosRequestConfig, 'params' | 'url' | 'method'>
+type PostConfig = Omit<AxiosRequestConfig, 'url' | 'data' | 'method'>
+type PatchConfig = Omit<AxiosRequestConfig, 'url' | 'data'>
+type DeleteConfig = Omit<AxiosRequestConfig, 'params'>
+
+export class Http {
+  instance: AxiosInstance
+  constructor(baseURL: string) {
+    this.instance = axios.create({
+      baseURL
+    })
+  }
+  get<R = unknown>(url: string, query?: Record<string, JSONValue>, config?: GetConfig) {
+    return this.instance.request<R>({ ...config, url: url, params: query, method: 'get' })
+  }
+  post<R = unknown>(url: string, data?: Record<string, JSONValue>, config?: PostConfig) {
+    return this.instance.request<R>({ ...config, url, data, method: 'post' })
+  }
+  patch<R = unknown>(url: string, data?: Record<string, JSONValue>, config?: PatchConfig) {
+    return this.instance.request<R>({ ...config, url, data, method: 'patch' })
+  }
+  delete<R = unknown>(url: string, query?: Record<string, string>, config?: DeleteConfig) {
+    return this.instance.request<R>({ ...config, url: url, params: query, method: 'delete' })
+  }
+}
+在上面提到的代码片段中，<R = unknown> 表示该函数 post 使用了泛型 R，并且默认类型是 unknown。这意味着你可以在使用该函数时，显式指定返回类型，如 post<MyResponseType>(url, data, config)，也可以省略类型参数，此时将使用默认的 unknown 类型。这样的设计提高了函数的灵活性，让它适用于不同类型的返回数据。
+
+protobuff
