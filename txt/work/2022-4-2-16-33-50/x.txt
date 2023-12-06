@@ -56,6 +56,11 @@ History 模式：
 优点： URL 更美观，不带 # 符号；前端路由使用起来更像传统的后端路由。
 缺点： 兼容性较差，不支持的浏览器需要有备用方案；需要服务器的支持，以避免在刷新页面或直接访问 URL 时返回 404。
 
+12.6：
+
+v-if和v-show的区别？
+尬住了，一时没想出来。其实字面意思就是了，if表示有没有，show通过css表示展示与否。
+
 Axios怎么封装的？
 TS泛型体操，Axios怎么写返回的参数。
 type GetConfig = Omit<AxiosRequestConfig, 'params' | 'url' | 'method'>
