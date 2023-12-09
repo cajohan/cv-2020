@@ -127,3 +127,7 @@ docker run
 这是一个简化的描述，实际过程中可能还涉及到缓存机制、安全性检查、重定向等额外步骤。
 
 
+C/S 架构（Client/Server Architecture）和 B/S 架构（Browser/Server Architecture）是两种不同的软件架构模型，它们主要区分在于客户端和服务器之间的关系。
+
+除了违法犯罪的事情，尽量不做否定发言。 ——某网友
+
