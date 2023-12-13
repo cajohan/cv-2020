@@ -131,6 +131,11 @@ C/S 架构（Client/Server Architecture）和 B/S 架构（Browser/Server Archit
 
 除了违法犯罪的事情，尽量不做否定发言。 ——某网友
 
+工期问题
+预估用时？
+越细越好；留好buffer。
+
+
 在Vuex和localstorage哪个快？Vuex，读的内存。
 
 你了解设计模式吗？单例模式有哪几种？
