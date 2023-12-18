@@ -147,3 +147,645 @@ C/S 架构（Client/Server Architecture）和 B/S 架构（Browser/Server Archit
 装饰器模式（套皮）、适配器模式（数据转换）
 代理模式，不直接操作原有对象，而是委托代理者去进行
 责任链模式？它允许你将请求沿着处理者链进行传递，直到有一个处理者能够处理该请求。每个处理者都包含了对下一个处理者的引用，从而形成一条责任链。
+
+12/18
+template 编译原理？
+
+  Vue 的模板编译原理是 Vue 框架实现数据绑定和虚拟 DOM 的关键部分之一。下面是 Vue 模板编译的主要步骤：
+
+  1.解析模板： Vue 编译器首先会解析模板字符串，将其转换为抽象语法树（AST，Abstract Syntax Tree）。AST 是一个树状结构，表示代码的抽象语法结构。
+
+  2.优化静态内容： 编译器会对静态内容进行优化，将其中不需要变动的部分提取出来，避免在每次渲染时都重新生成。
+
+  3.生成渲染函数： 将 AST 转换为渲染函数。渲染函数是一个函数，接收数据作为参数，返回虚拟 DOM。
+
+  4.生成虚拟 DOM： 渲染函数执行时，会生成虚拟 DOM（Virtual DOM）树。虚拟 DOM 是一个轻量级的 JavaScript 对象，用于描述真实 DOM 树的结构。
+
+  5.创建 Watcher： 每个使用了响应式数据的组件都会创建一个 Watcher 对象。Watcher 会在组件渲染时订阅数据变化，当数据变化时，会重新执行渲染函数。
+
+  6.渲染： 初次渲染时，将虚拟 DOM 转换为真实 DOM 并插入到页面中。在数据变化时，Watcher 会收到通知，重新执行渲染函数生成新的虚拟 DOM，然后通过比对算法（diff 算法）找出变化的部分，最终更新到真实 DOM 上。
+
+  这个过程中，Vue 利用模板语法中的指令和表达式，将数据和 DOM 进行绑定。这使得当数据发生变化时，Vue 能够高效地更新视图。
+
+  需要注意的是，Vue 的模板编译是在运行时执行的，这也是为什么 Vue 推崇运行时构建（Runtime-only）的原因，避免了在生产环境中需要模板编译器的开销。
+
+watch和watchEffect？
+
+  在 Vue 3 中，watch 和 watchEffect 是用于监视数据变化并执行相应操作的两个 API。它们的主要区别在于响应式数据的追踪方式和使用场景。
+
+  watch
+  watch 是一个更灵活的 API，允许你监视特定的数据变化并执行自定义的回调函数。它的基本语法如下：
+
+  javascript
+  Copy code
+  watch(source, callback, options?)
+  source: 要监视的数据源，可以是一个 getter 函数或一个响应式对象/数组的引用。
+  callback: 当 source 中的数据发生变化时执行的回调函数。
+  options: 可选配置项，用于设置一些选项，例如 deep（是否深度监听）等。
+  是否创建时监听：
+  handler:function(o,n){},
+  immediate: true
+  示例：
+
+  javascript
+  Copy code
+  const data = ref(0);
+
+  watch(data, (newValue, oldValue) => {
+    console.log(`Data changed from ${oldValue} to ${newValue}`);
+  });
+  watchEffect
+  watchEffect 是一个更自动的 API，它会自动追踪其回调函数内部使用的响应式数据，并在这些数据变化时重新执行回调函数。它的基本语法如下：
+
+  javascript
+  Copy code
+  watchEffect(effect, options?)
+  effect: 一个包含响应式数据读取操作的函数。Vue 会自动追踪此函数内部使用的响应式数据，并在数据变化时重新执行此函数。
+  options: 可选配置项，用于设置一些选项，例如 flush（何时执行回调，是同步还是异步）等。
+  示例：
+
+  javascript
+  Copy code
+  const data = ref(0);
+
+  watchEffect(() => {
+    console.log(`Data is: ${data.value}`);
+  });
+  区别
+  watch 需要明确指定要监视的数据，而 watchEffect 会自动追踪函数内部使用的响应式数据。
+  watch 的回调函数接收两个参数（新值和旧值），而 watchEffect 的回调函数不接收参数，直接访问响应式数据即可。
+  watch 具有更多的配置选项，可以更精细地控制监视行为。
+  通常情况下，如果你需要监视特定的数据并执行一些特定的操作，使用 watch；如果你只需要在函数内部自动追踪响应式数据的变化，使用 watchEffect。
+
+js判断类型？判断空数组？
+
+  在 JavaScript 中，可以使用不同的方式来判断一个值的类型。以下是一些常见的方法：
+
+  typeof 操作符：
+  使用 typeof 操作符可以获得一个值的基本类型。
+
+  javascript
+  Copy code
+  typeof 42;          // "number"
+  typeof "Hello";     // "string"
+  typeof true;        // "boolean"
+  typeof undefined;   // "undefined"
+  typeof null;        // "object" （注意这是 typeof 的一个历史 bug）
+  typeof {};          // "object"
+  typeof [];          // "object"
+  typeof function(){};// "function"
+  注意，typeof null 返回 "object" 是 JavaScript 的一个已知问题。
+
+  Object.prototype.toString：
+  使用 Object.prototype.toString 方法可以更精准地获取对象的具体类型。
+
+  javascript
+  Copy code
+  Object.prototype.toString.call(42);          // "[object Number]"
+  Object.prototype.toString.call("Hello");     // "[object String]"
+  Object.prototype.toString.call(true);        // "[object Boolean]"
+  Object.prototype.toString.call(undefined);   // "[object Undefined]"
+  Object.prototype.toString.call(null);        // "[object Null]"
+  Object.prototype.toString.call({});          // "[object Object]"
+  Object.prototype.toString.call([]);          // "[object Array]"
+  Object.prototype.toString.call(function(){});// "[object Function]"
+  instanceof 操作符：
+  使用 instanceof 操作符可以检查对象是否是某个构造函数的实例。
+
+  javascript
+  Copy code
+  const obj = {};
+  obj instanceof Object;   // true
+
+  const arr = [];
+  arr instanceof Array;    // true
+
+  const func = function() {};
+  func instanceof Function; // true
+  注意，instanceof 在处理原始类型时并不适用。
+
+  Array.isArray：
+  使用 Array.isArray 方法可以检查一个值是否是数组。
+
+  javascript
+  Copy code
+  Array.isArray([]);       // true
+  Array.isArray({});       // false
+  以上这些方法可以根据具体的使用场景和需求选择。在实际编码中，通常会结合多个方法来完成更全面的类型判断。
+
+  对象判空：Object.keys；for...in + hasOwnProperty；JSON.stringify
+
+||和？？的区别？
+
+  ？？更严格
+  
+浅拷贝和深拷贝？JSON深拷贝的问题
+
+  浅拷贝和深拷贝是在处理对象和数组时常用的两种拷贝方式，它们的区别在于是否复制了对象或数组中嵌套的对象和数组。
+
+  浅拷贝
+  浅拷贝只会复制对象或数组的第一层结构，而不会复制嵌套的对象或数组。JavaScript 中有几种浅拷贝的方法：
+
+  使用扩展运算符（...）：
+
+  javascript
+  Copy code
+  const originalArray = [1, 2, 3];
+  const shallowCopyArray = [...originalArray];
+
+  const originalObject = { a: 1, b: 2 };
+  const shallowCopyObject = { ...originalObject };
+  使用 Object.assign 方法：
+
+  javascript
+  Copy code
+  const originalArray = [1, 2, 3];
+  const shallowCopyArray = Object.assign([], originalArray);
+
+  const originalObject = { a: 1, b: 2 };
+  const shallowCopyObject = Object.assign({}, originalObject);
+  深拷贝
+  深拷贝会复制对象或数组的所有层级，包括嵌套的对象或数组。实现深拷贝的方法较为复杂，可以使用一些库或手动递归实现。
+
+  使用 Lodash 库：
+
+  Lodash 提供了 _.cloneDeep 方法，用于深拷贝对象或数组。
+
+  javascript
+  Copy code
+  const _ = require('lodash');
+
+  const originalArray = [1, 2, [3, 4]];
+  const deepCopyArray = _.cloneDeep(originalArray);
+
+  const originalObject = { a: 1, b: { c: 2 } };
+  const deepCopyObject = _.cloneDeep(originalObject);
+  手动递归实现：
+
+  javascript
+  Copy code
+  function deepClone(obj) {
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(deepClone);
+    }
+
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [key, deepClone(value)])
+    );
+  }
+
+  const originalArray = [1, 2, [3, 4]];
+  const deepCopyArray = deepClone(originalArray);
+
+  const originalObject = { a: 1, b: { c: 2 } };
+  const deepCopyObject = deepClone(originalObject);
+  注意：手动递归实现深拷贝可能会有一些性能上的影响，因此在实际项目中建议使用经过测试和优化的库，如 Lodash 的 _.cloneDeep。
+  
+  JSON深拷贝的问题：
+  使用 JSON.stringify 和 JSON.parse 进行深拷贝是一种常见的方式，但它有一些限制和注意事项，可能会导致一些问题：
+
+  1. 循环引用问题：
+  如果对象中存在循环引用（对象内部引用自身），则使用 JSON.stringify 会抛出错误，因为 JSON 格式不支持循环引用。
+
+  javascript
+  Copy code
+  const obj = { a: 1 };
+  obj.b = obj;  // 循环引用
+
+  try {
+    const deepCopy = JSON.parse(JSON.stringify(obj));  // 抛出错误
+  } catch (error) {
+    console.error(error);
+  }
+  2. 丢失特殊对象的信息：
+  在对象中，一些特殊的对象属性（例如原型链上的属性、不可枚举属性）以及特殊的对象（例如 RegExp、Date、Map、Set）在经过 JSON 转换后可能会失去原有的信息。
+
+  javascript
+  Copy code
+  const obj = { date: new Date() };
+  const deepCopy = JSON.parse(JSON.stringify(obj));
+
+  console.log(deepCopy.date);  // 日期被转换为字符串
+  对于 Date 对象，会被转换为字符串，而不再是一个 Date 对象。
+
+  3. 函数丢失问题：
+  包含函数的对象在经过 JSON 转换时，函数会被忽略。
+
+  javascript
+  Copy code
+  const obj = { func: () => console.log('Hello') };
+  const deepCopy = JSON.parse(JSON.stringify(obj));
+
+  console.log(deepCopy.func);  // undefined
+  函数属性会被忽略，因为 JSON 不支持序列化函数。
+
+  总体来说，JSON.stringify 和 JSON.parse 是一种简便的深拷贝方式，适用于大多数普通对象和数组的情况。然而，如果你的对象包含循环引用、特殊对象或函数等情况，可能需要考虑其他深拷贝方法，如使用第三方库（如 Lodash 的 _.cloneDeep）或手动递归实现深拷贝。
+
+
+promise 可以取消吗？
+
+  JavaScript 中的 Promise 本身是不支持取消的，一旦一个 Promise 被创建并开始执行，就会一直执行到完成或被拒绝。这是因为 Promise 是一种表示异步操作最终完成或失败的机制，而取消一个正在执行的异步操作通常需要在异步操作内部支持。
+
+  然而，可以通过其他方式来实现类似取消的效果，比如使用额外的控制变量、AbortController 等。
+
+  使用额外的控制变量：
+  可以在执行异步操作的同时使用一个控制变量，当需要取消时，修改该变量的状态，并在异步操作内部检查这个变量状态，然后提前结束操作。
+
+  javascript
+  Copy code
+  let isCancelled = false;
+
+  const myPromise = new Promise((resolve, reject) => {
+    // 异步操作
+    if (isCancelled) {
+      reject(new Error('Cancelled'));
+    } else {
+      // 执行异步操作
+      // ...
+      resolve('Operation completed');
+    }
+  });
+
+  // 取消操作
+  isCancelled = true;
+  使用 AbortController：
+  AbortController 是一个用于控制异步操作的 API，在需要取消时，可以调用 abort() 方法。
+
+  javascript
+  Copy code
+  const controller = new AbortController();
+  const signal = controller.signal;
+
+  const myPromise = new Promise((resolve, reject) => {
+    // 异步操作
+    // 在需要取消时
+    controller.abort();
+  });
+
+  myPromise.catch((err) => {
+    if (err.name === 'AbortError') {
+      console.log('Operation cancelled');
+    } else {
+      // 处理其他错误
+    }
+  });
+  请注意，使用额外的控制变量或 AbortController 需要在异步操作内部显式地检查取消状态。并且，并非所有的异步操作都能够被取消，这取决于具体的异步操作的实现。
+
+new 箭头函数会怎样？
+
+  会报错。
+  在 JavaScript 中，使用 new 关键字创建对象实例时，会经过以下步骤：
+
+  1.创建一个新的空对象： 一个新的空对象被创建，该对象成为新创建的实例。
+
+  2.将构造函数的作用域赋给新对象（设置对象的原型）： 新对象的 [[Prototype]]（内部属性，可以通过 Object.getPrototypeOf(obj) 获取）被设置为构造函数的 prototype 属性。这一步是为了确保新对象可以访问构造函数原型链上的属性和方法。
+
+  3.执行构造函数： 构造函数被调用，其内部的 this 指向新创建的空对象。这使得构造函数可以通过 this 来操作新对象。
+
+  4.返回新对象： 如果构造函数没有明确返回一个对象，那么 new 表达式将返回新创建的对象实例。如果构造函数显式地返回了一个对象，则返回该对象而不是新创建的实例。
+
+  当你尝试使用 new 关键字调用箭头函数时，会引发 TypeError。这是因为箭头函数没有自己的 this 上下文，它捕获了创建时所在的上下文的 this，而且无法被改变。这使得箭头函数不具备像普通函数那样的构造函数特性。
+
+箭头函数里 settimeout 的函数的 this？ 
+
+  在箭头函数中，this 的值是在函数创建时确定的，而不是在运行时。箭头函数不会创建自己的 this，而是捕获了它所在上下文中的 this，并且不可改变。这是箭头函数与普通函数不同的关键之处。
+
+  具体来说，箭头函数的 this 取决于箭头函数被定义的位置。当箭头函数被创建时，它捕获了所在上下文的 this 值，并在整个生命周期中保持不变。这种行为与普通函数不同，普通函数的 this 的值在运行时会根据调用方式而变化。
+
+两个等于和三个等于？
+
+  在JavaScript中，有两种常见的比较运算符，即"=="（两个等于号）和"==="（三个等于号）。
+
+  双等号 "=="： 它执行弱相等比较，会在比较之前进行类型转换。如果两个操作数的值相等，它们就被认为是相等的，即使它们的数据类型不同。这可能导致一些意外的类型转换，因此通常建议避免在判断相等性时使用双等号。
+
+  javascript
+  Copy code
+  "5" == 5 // true，进行了类型转换
+  三等号 "==="： 它执行严格相等比较，不进行类型转换。只有在值和类型都相等的情况下，它们才被认为是相等的。使用三等号通常更安全，因为它避免了一些可能导致 bug 的隐式类型转换。
+
+  javascript
+  Copy code
+  "5" === 5 // false，不进行类型转换
+  总的来说，推荐使用"==="进行比较，因为它更严格，不会进行类型转换，避免了一些潜在的问题。在某些情况下，使用"=="可能会导致不直观的行为，因此最好在可能的情况下使用"==="。
+
+vue stop，修饰符你知道吗？
+
+  Vue.js 提供了一些常见的事件修饰符，用于修改事件处理函数的行为。以下是一些常见的修饰符：
+
+  1. .stop： 阻止事件冒泡，即阻止事件向上传播到父元素。
+
+  html
+  Copy code
+  <a @click.stop="handleClick">阻止事件冒泡</a>
+  2. .prevent： 阻止默认行为，即取消事件的默认动作。
+
+  html
+  Copy code
+  <form @submit.prevent="handleSubmit">阻止表单提交</form>
+  3. .capture： 添加事件监听器时使用事件捕获模式。
+
+  html
+  Copy code
+  <div @click.capture="handleClick">捕获模式</div>
+  .self： 只当事件是从当前元素本身触发时才触发处理函数。
+
+  html
+  Copy code
+  <div @click.self="handleClick">只处理自身触发的点击</div>
+  4. .once： 事件只触发一次。
+
+  html
+  Copy code
+  <button @click.once="handleClick">只触发一次</button>
+  5. .passive： 指示浏览器不应该阻止事件的默认行为。
+
+  html
+  Copy code
+  <div @touchstart.passive="handleTouchStart">触摸事件，不阻止默认行为</div>
+  这些修饰符可以组合使用，例如：@click.stop.prevent 可以同时阻止事件冒泡和取消默认行为。选择使用哪些修饰符取决于具体的需求和场景。
+
+map和set？
+
+  Map 和 Set 都是 JavaScript 中的集合类型，用于存储多个值。它们有一些相似之处，但在用途和行为上也有一些区别。
+
+  Map
+  键值对存储： Map 是一种键值对的集合，其中每个键都是唯一的。
+  任何数据类型作为键： 可以使用任何数据类型作为键，包括基本数据类型和对象。
+  有序迭代： 在迭代时，Map 会按照元素插入的顺序进行迭代。
+  Size 属性： Map 有一个 size 属性，表示其中键值对的数量。
+  迭代方法： 提供了 forEach 方法用于迭代，也可以通过 entries、keys 和 values 方法获取键值对、键或值的迭代器。
+  javascript
+  Copy code
+  let myMap = new Map();
+
+  myMap.set('key1', 'value1');
+  myMap.set('key2', 'value2');
+
+  console.log(myMap.get('key1')); // 输出 'value1'
+  console.log(myMap.size); // 输出 2
+
+  myMap.forEach((value, key) => {
+    console.log(key, value);
+  });
+  Set
+  唯一值存储： Set 是一种值的集合，其中每个值都是唯一的。
+  任何数据类型作为值： 可以使用任何数据类型作为值，包括基本数据类型和对象。
+  无序迭代： 在迭代时，Set 不保证按照插入顺序进行迭代。
+  Size 属性： Set 有一个 size 属性，表示其中值的数量。
+  迭代方法： 提供了 forEach 方法用于迭代，也可以通过 values 方法获取值的迭代器。
+  javascript
+  Copy code
+  let mySet = new Set();
+
+  mySet.add('value1');
+  mySet.add('value2');
+
+  console.log(mySet.has('value1')); // 输出 true
+  console.log(mySet.size); // 输出 2
+
+  mySet.forEach(value => {
+    console.log(value);
+  });
+  总结
+  使用 Map 当你需要存储键值对，并且对插入顺序敏感时。
+  使用 Set 当你只关心唯一值的集合，而不关心顺序时。
+
+css3新增了哪些特性？
+
+  CSS3 引入了许多新特性，扩展了对样式和布局的控制。以下是一些 CSS3 的主要新增特性：
+
+  Flexbox 布局： 引入了 Flexbox（弹性盒子布局），使得更灵活的、自适应的页面布局变得更容易实现。
+
+  Grid 布局： 引入了 Grid 布局系统，允许开发者以更直观的方式定义复杂的网格结构，实现更复杂的页面布局。
+
+  多列布局（Multiple Columns）： 允许将文本分为多列，使得文本排版更灵活，适应不同尺寸的屏幕。
+
+  自定义字体（@font-face）： 允许网页设计师使用自定义字体，而不仅仅局限于用户设备上已安装的字体。
+
+  过渡效果（Transitions）： 引入了过渡效果，使得在状态变化时能够平滑过渡，提升用户体验。
+
+  变形效果（Transforms）： 允许元素进行旋转、缩放、平移和倾斜，为实现动画效果提供更多可能性。
+
+  动画效果（Animations）： 引入了关键帧动画（Keyframes），使得开发者能够创建更为复杂的动画效果。
+
+  渐变（Gradients）： 支持线性渐变和径向渐变，使得背景和元素颜色可以更灵活地定义。
+
+  圆角边框（Border-radius）： 允许为元素的边框添加圆角，实现更圆润的界面。
+
+  阴影（Box-shadow）： 允许为元素添加投影效果，增强元素的立体感。
+
+  透明度（Opacity）： 允许设置元素的透明度，创建半透明效果。
+
+  颜色和透明度的 RGBA 和 HSLA： 引入了 RGBA（红绿蓝和透明度）和 HSLA（色调、饱和度、亮度和透明度）颜色表示方式。
+
+  用户界面样式（User Interface）： 允许样式化滚动条、调整拖拽区域的样式等。
+
+  这些是 CSS3 中的一些重要特性，它们使得前端开发者能够更灵活地控制页面的样式和布局。请注意，由于 CSS 标准的不断发展，可能会有新的特性被引入或旧的特性发生变化。
+
+vue常见插槽？
+
+  Vue.js 提供了一些内置的插槽，用于在组件中进行灵活的内容分发。以下是一些常见的内置插槽：
+
+  1.默认插槽（default）：
+
+  插槽名称：没有指定名称的插槽，默认插槽。
+  使用方式：直接将内容放置在组件标签之间。
+  html
+  Copy code
+  <my-component>
+    <!-- 默认插槽的内容 -->
+    <p>Hello, world!</p>
+  </my-component>
+
+  2.具名插槽：
+
+  插槽名称：通过 v-slot 指令指定的插槽名称。
+  使用方式：使用 v-slot 指令指定插槽名称，将内容放置在相应的插槽中。
+  html
+  Copy code
+  <my-component>
+    <template v-slot:header>
+      <!-- 具名插槽 header 的内容 -->
+      <h1>Page Title</h1>
+    </template>
+
+    <template v-slot:footer>
+      <!-- 具名插槽 footer 的内容 -->
+      <p>Copyright © 2023</p>
+    </template>
+  </my-component>
+
+  3.作用域插槽（scoped）：
+
+  插槽名称：通过 v-slot 指令指定的插槽名称，使用 slot-scope 或 # 简写。
+  使用方式：使用 v-slot 指令指定插槽名称，同时通过 slot-scope 或 # 简写获取插槽中的数据。
+  html
+  Copy code
+  <my-component>
+    <template v-slot:default="slotProps">
+      <!-- 作用域插槽的内容，可以访问 slotProps 中的数据 -->
+      <p>{{ slotProps.item }}</p>
+    </template>
+  </my-component>
+  这些插槽使得组件更加灵活，能够接受不同的内容和数据。在使用插槽时，组件作者可以提供一些默认的内容，同时也给予使用者覆盖或扩展的机会。插槽是 Vue 组件中非常强大和重要的特性之一。
+
+tostring 为什么会不一样？
+
+  const obj = {};
+  const objToString = Object.prototype.toString.call(obj);
+  console.log(objToString); // 输出 "[object Object]"
+
+ts的readonly和const？
+
+  1.const 用于变量， readonly 用于属性
+
+  2.const 在运行时检查， readonly 在编译时检查
+
+  3.const 声明的变量不得改变值，这意味着，const 一旦声明变量，就必须立即初始化，不能留到以后赋值； readonly 修饰的属性能确保自身不能修改属性，但是当你把这个属性交给其它并没有这种保证的使用者（允许出于类型兼容性的原因），他们能改变
+
+  const foo: {
+    readonly bar: number;
+  } = {
+    bar: 123
+  };
+
+  function iMutateFoo(foo: { bar: number }) {
+    foo.bar = 456;
+  }
+
+  iMutateFoo(foo);
+  console.log(foo.bar); // 456
+  此时，需要 iMutateFoo 明确的表示，他们的参数不可修改，那么编译器会发出错误警告：
+
+  function iTakeFoo(foo: Foo) {
+    foo.bar = 456; // Error: bar 属性只读
+  }
+  4.const 保证的不是变量的值不得改动，而是变量指向的那个内存地址不得改动，例如使用 const 变量保存的数组，可以使用 push ， pop 等方法。但是如果使用 ReadonlyArray<number> 声明的数组不能使用 push ， pop 等方法。
+
+async和await实现原理？
+
+  async 和 await 是 ECMAScript 2017 (ES8) 中引入的一组特性，用于更方便地处理异步代码。它们的实现原理基于 Promise。
+
+  1.async 函数：
+
+  async 函数返回一个 Promise 对象。在函数体内，通过 await 关键字来等待 Promise 对象的解决或拒绝。
+  当函数内部有异步操作时，函数会被自动包装成一个 Promise 对象。
+  javascript
+  Copy code
+  async function exampleAsyncFunction() {
+    return 42;
+  }
+
+  exampleAsyncFunction().then(result => {
+    console.log(result); // 输出: 42
+  });
+  2.await 表达式：
+
+  await 关键字只能在 async 函数内部使用。
+  当 await 关键字用于等待一个 Promise 完成时，它会暂停函数的执行，直到 Promise 解决或拒绝。
+  javascript
+  Copy code
+  async function exampleAsyncFunction() {
+    const result = await someAsyncOperation();
+    console.log(result);
+  }
+  3.Promise 原理：
+
+  async 函数的实现依赖于 Promise 对象。当 async 函数执行时，它会返回一个 Promise，该 Promise 在函数内部执行异步操作时被 resolve 或 reject。
+  await 表达式实际上是 Promise 的语法糖，它暂停 async 函数的执行，等待 Promise 解决，然后将解决的值返回。
+  javascript
+  Copy code
+  function asyncFunction() {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(42);
+      }, 1000);
+    });
+  }
+
+  async function exampleAsyncFunction() {
+    const result = await asyncFunction();
+    console.log(result); // 输出: 42
+  }
+
+  exampleAsyncFunction();
+  总体来说，async 和 await 的实现基于 Promise 对象，使得异步代码的编写和理解更加清晰和简单。async 函数返回的 Promise 对象会根据函数内部的执行情况进行解决或拒绝。await 表达式在等待 Promise 完成时暂停函数的执行，直到 Promise 完成。
+
+src和href？
+
+  src 和 href 是 HTML 中两个常见的属性，它们分别用于不同的情境。
+
+  src 属性：
+
+  src 是 "source" 的缩写，通常用于指定外部资源（比如图片、脚本、嵌套的页面等）的路径。
+  对于脚本（如 JavaScript）和嵌套的页面（如 iframe），src 属性指定了要加载的资源的 URL。
+  当浏览器解析到带有 src 属性的标签时，会立即加载并执行这个资源。
+  html
+  Copy code
+  <!-- 示例：加载外部图片 -->
+  <img src="example.jpg" alt="Example Image">
+
+  <!-- 示例：引入外部 JavaScript 文件 -->
+  <script src="example.js"></script>
+  href 属性：
+
+  href 是 "hypertext reference" 的缩写，主要用于指定超链接的目标。
+  用于链接样式表、页面之间的链接以及其他需要超链接的场合。
+  当浏览器解析到带有 href 属性的标签时，会根据该属性的值导航到对应的目标。
+  html
+  Copy code
+  <!-- 示例：链接样式表 -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- 示例：超链接 -->
+  <a href="https://www.example.com">Visit Example</a>
+  总结：
+
+  src 通常用于指定要嵌入文档的外部资源的位置。
+  href 通常用于指定超链接的目标，或者在链接样式表时指定样式表文件的位置。
+  虽然它们在用途上有区别，但实际上，这只是一种约定，浏览器在处理不同标签和属性时有不同的行为。
+  
+enum和常量枚举（const枚举）？
+
+  使用枚举可以清晰地表达意图或创建一组有区别的用例
+
+  // 枚举
+  enum Color {
+    Red,
+    Green,
+    Blue
+  }
+
+  // 常量枚举
+  const enum Color {
+    Red,
+    Green,
+    Blue
+  }
+  区别
+  枚举会被编译时会编译成一个对象，可以被当作对象使用
+  const 枚举会在 typescript 编译期间被删除，const 枚举成员在使用的地方会被内联进来，避免额外的性能开销
+  // 枚举
+  enum Color {
+    Red,
+    Green,
+    Blue
+  }
+
+  var sisterAn = Color.Red
+  // 会被编译成 JavaScript 中的 var sisterAn = Color.Red
+  // 即在运行执行时，它将会查找变量 Color 和 Color.Red
+  // 常量枚举
+  const enum Color {
+    Red,
+    Green,
+    Blue
+  }
+
+  var sisterAn = Color.Red
+  // 会被编译成 JavaScript 中的 var sisterAn = 0
+  // 在运行时已经没有 Color 变量
