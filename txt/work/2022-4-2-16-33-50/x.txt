@@ -748,7 +748,7 @@ src和href？
   src 通常用于指定要嵌入文档的外部资源的位置。
   href 通常用于指定超链接的目标，或者在链接样式表时指定样式表文件的位置。
   虽然它们在用途上有区别，但实际上，这只是一种约定，浏览器在处理不同标签和属性时有不同的行为。
-  
+
 enum和常量枚举（const枚举）？
 
   使用枚举可以清晰地表达意图或创建一组有区别的用例
@@ -789,3 +789,42 @@ enum和常量枚举（const枚举）？
   var sisterAn = Color.Red
   // 会被编译成 JavaScript 中的 var sisterAn = 0
   // 在运行时已经没有 Color 变量
+
+ref和reactive
+
+  在 Vue 3 中，ref 和 reactive 是 Vue 3 Composition API 提供的两个用于处理响应式数据的函数。
+
+  ref：
+
+  ref 用于创建一个包装基本类型的响应式对象，例如数字、字符串等。
+  返回一个包含 value 属性的对象，通过访问这个对象的 value 属性来读取和修改包装的值。
+  ref 的使用场景主要是处理简单的基本类型数据。
+  javascript
+  Copy code
+  import { ref } from 'vue';
+
+  const count = ref(0);
+
+  console.log(count.value); // 读取值
+  count.value++; // 修改值
+  reactive：
+
+  reactive 用于创建一个包装对象的响应式代理，可以处理复杂的对象和嵌套结构。
+  返回一个代理对象，直接访问这个对象的属性即可触发响应式更新。
+  reactive 的使用场景主要是处理复杂的对象，如包含嵌套结构的数据。
+  javascript
+  Copy code
+  import { reactive } from 'vue';
+
+  const person = reactive({
+    name: 'John',
+    age: 25,
+    address: {
+      city: 'New York',
+      zip: '10001'
+    }
+  });
+
+  console.log(person.name); // 读取值
+  person.age++; // 修改值
+  总体而言，ref 适用于简单的基本类型数据，而 reactive 适用于复杂的对象和嵌套结构。在实际应用中，你可以根据数据的特性选择使用其中之一，或者根据需要混合使用。Composition API 的灵活性允许你更自由地组织和处理组件内的响应式数据。
