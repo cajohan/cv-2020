@@ -1,0 +1,36 @@
+访问地址：https://web.archive.org/save/ + 要保存网页的地址
+例如我们现在保存 https://photo.fuyeor.com/content/choice 这个页面，就访问：
+
+https://web.archive.org/save/https://photo.fuyeor.com/content/choice
+
+前端面试题之 HTML
+https://web.archive.org/web/20231219174954/https://www.yuque.com/u1598738/sosqk7/fpdp3ms3568rrqre
+https://www.yuque.com/u1598738/sosqk7/fpdp3ms3568rrqre
+
+CSS
+https://web.archive.org/web/20231219175634/https://www.yuque.com/u1598738/sosqk7/puchtlvlg9p77qw8
+https://www.yuque.com/u1598738/sosqk7/puchtlvlg9p77qw8
+
+JavaScript篇
+https://web.archive.org/web/20231219172909/https://www.yuque.com/u1598738/sosqk7/dt6l4nm0b0czlbkh
+https://www.yuque.com/u1598738/sosqk7/dt6l4nm0b0czlbkh
+
+手写代码
+https://web.archive.org/web/20231219180033/https://www.yuque.com/u1598738/sosqk7/ia08mubiws4f33u1
+https://www.yuque.com/u1598738/sosqk7/ia08mubiws4f33u1
+
+工程化
+https://web.archive.org/web/20231219180023/https://www.yuque.com/u1598738/sosqk7/ypfswgvi4qhaozal
+https://www.yuque.com/u1598738/sosqk7/ypfswgvi4qhaozal
+
+性能优化
+https://web.archive.org/web/20231219180056/https://www.yuque.com/u1598738/sosqk7/ac19c3bc4pok6wm8
+https://www.yuque.com/u1598738/sosqk7/ac19c3bc4pok6wm8
+
+Vue
+https://web.archive.org/web/20231219180143/https://www.yuque.com/u1598738/sosqk7/umhsbn8fmka684hb
+https://www.yuque.com/u1598738/sosqk7/umhsbn8fmka684hb
+
+React
+https://web.archive.org/web/20231219180255/https://www.yuque.com/u1598738/sosqk7/yrzogpsf9mwdg4ux
+https://www.yuque.com/u1598738/sosqk7/yrzogpsf9mwdg4ux
