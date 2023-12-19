@@ -828,3 +828,236 @@ ref和reactive
   console.log(person.name); // 读取值
   person.age++; // 修改值
   总体而言，ref 适用于简单的基本类型数据，而 reactive 适用于复杂的对象和嵌套结构。在实际应用中，你可以根据数据的特性选择使用其中之一，或者根据需要混合使用。Composition API 的灵活性允许你更自由地组织和处理组件内的响应式数据。
+
+foreach 和 map 会改原数组吗
+
+  forEach 和 map 都是用来遍历数组的方法，但它们在处理原数组的方式上有一些不同。
+
+  1.forEach：
+
+  forEach 是一个遍历数组的方法，它接受一个回调函数作为参数，并对数组中的每个元素都执行一次这个回调函数。forEach 不会创建新的数组，而是直接在原数组上进行操作。它不返回新的数组，返回值是 undefined。
+  forEach 的回调函数可以改变原数组中的元素，但不能改变数组的长度。
+  javascript
+  Copy code
+  const numbers = [1, 2, 3];
+
+  numbers.forEach((num, index, array) => {
+    array[index] = num * 2;
+  });
+
+  console.log(numbers); // [2, 4, 6]
+
+  2.map：
+
+  map 也是用于遍历数组的方法，它创建一个新的数组，将每个元素都传递给回调函数，并将回调函数的返回值存储在新数组中。map 不会改变原数组，而是返回一个新的数组。
+  map 的回调函数可以改变元素的值，但不会改变原数组。
+  javascript
+  Copy code
+  const numbers = [1, 2, 3];
+
+  const doubledNumbers = numbers.map(num => num * 2);
+
+  console.log(numbers); // [1, 2, 3]
+  console.log(doubledNumbers); // [2, 4, 6]
+  总体而言，如果你希望在遍历数组时修改原数组，可以使用 forEach。如果你想要创建一个新的数组，其中包含对每个元素应用某个操作的结果，可以使用 map。
+
+数组常用方法？数组怎么转字符串？
+
+  数组常用方法有很多，以下是一些常见的数组方法：
+
+  遍历数组：
+
+  forEach()：对数组的每个元素执行一次提供的函数。
+  map()：创建一个新数组，其结果是该数组中的每个元素调用一个提供的函数。
+  filter()：创建一个新数组，其中包含通过测试的所有元素。
+  reduce()：对数组的每个元素执行一个累积操作，返回最终累积的结果。
+  修改数组：
+
+  push()：将一个或多个元素添加到数组的末尾。
+  pop()：删除数组的最后一个元素。
+  shift()：删除数组的第一个元素。
+  unshift()：将一个或多个元素添加到数组的开头。
+  splice()：从数组中添加或删除元素。
+  查询数组：
+
+  indexOf()：返回数组中指定元素的第一个索引，如果不存在则返回 -1。
+  lastIndexOf()：返回数组中指定元素的最后一个索引，如果不存在则返回 -1。
+  includes()：判断数组是否包含指定元素。
+  数组转换：
+
+  join()：将数组的所有元素连接成一个字符串。
+  toString()：将数组转换为字符串。
+  concat()：连接两个或多个数组。
+  其他：
+
+  sort()：对数组进行排序。
+  reverse()：颠倒数组中元素的顺序。
+  slice()：提取数组的一部分。
+  数组转字符串的方法：
+
+  join() 方法：
+
+  join() 方法将数组的所有元素连接成一个字符串。可以传递一个字符串作为参数，该字符串将作为分隔符插入到数组元素之间。
+  javascript
+  Copy code
+  const fruits = ['apple', 'banana', 'orange'];
+  const result = fruits.join(', '); // 使用逗号和空格连接数组元素
+  console.log(result); // "apple, banana, orange"
+  toString() 方法：
+
+  toString() 方法是 JavaScript 中数组的原生方法，它将数组转换为一个字符串。
+  javascript
+  Copy code
+  const fruits = ['apple', 'banana', 'orange'];
+  const result = fruits.toString();
+  console.log(result); // "apple,banana,orange"
+  注意：这两种方法都不会修改原始数组，而是返回一个新的字符串。
+
+你怎么理解vue 单向数据流？
+
+  Vue 单向数据流是指数据在应用中的流动方向是单向的，从父组件传递到子组件。这种数据流的单向性是 Vue 中数据管理的一个重要原则，它有助于组件之间的数据传递和状态管理，提高了程序的可维护性和可理解性。
+
+  具体而言，Vue 单向数据流体现在以下几个方面：
+
+  父子组件关系：
+
+  数据流向是从父组件传递到子组件。父组件通过 props 将数据传递给子组件。
+  html
+  Copy code
+  <!-- 父组件 -->
+  <template>
+    <ChildComponent :message="parentMessage" />
+  </template>
+
+  <script>
+  import ChildComponent from './ChildComponent.vue';
+
+  export default {
+    data() {
+      return {
+        parentMessage: 'Hello from parent!'
+      };
+    },
+    components: {
+      ChildComponent
+    }
+  };
+  </script>
+  html
+  Copy code
+  <!-- 子组件 -->
+  <template>
+    <div>{{ message }}</div>
+  </template>
+
+  <script>
+  export default {
+    props: ['message']
+  };
+  </script>
+  子组件不直接修改父组件的数据：
+
+  子组件通过触发事件（emit）来通知父组件修改数据。子组件应该保持对父组件数据的只读访问。
+  html
+  Copy code
+  <!-- 子组件 -->
+  <template>
+    <button @click="notifyParent">Click me</button>
+  </template>
+
+  <script>
+  export default {
+    methods: {
+      notifyParent() {
+        this.$emit('notify', 'Hello from child!');
+      }
+    }
+  };
+  </script>
+  html
+  Copy code
+  <!-- 父组件 -->
+  <template>
+    <ChildComponent @notify="handleNotify" />
+  </template>
+
+  <script>
+  import ChildComponent from './ChildComponent.vue';
+
+  export default {
+    methods: {
+      handleNotify(message) {
+        console.log(message); // "Hello from child!"
+      }
+    },
+    components: {
+      ChildComponent
+    }
+  };
+  </script>
+  Vuex 状态管理：
+
+  对于大型应用，Vue 推荐使用 Vuex 进行状态管理。Vuex 中的状态是响应式的，但只能通过 mutations 来修改，确保了对状态的修改是可追踪的。
+  javascript
+  Copy code
+  // Vuex store 中的 state 和 mutation 示例
+  const store = new Vuex.Store({
+    state: {
+      count: 0
+    },
+    mutations: {
+      increment(state) {
+        state.count++;
+      }
+    }
+  });
+  通过这种单向数据流的机制，Vue 确保了数据的可追踪性、可预测性，使得应用的数据管理更加清晰和易于维护。
+
+vue怎么传数据，子组件能改父组件数据吗？
+
+  通过props传，
+  可以改，但如果子组件直接修改了父组件的数据，父组件的数据发生变化，但视图不会立即更新。
+  这是因为 Vue 的响应式系统是基于 JavaScript 的 getter 和 setter 实现的，当你直接修改一个对象或数组的属性时，Vue 无法捕捉到这种变化。
+
+  然而，Vue 提供了一些方法来强制触发视图更新：
+
+  this.$forceUpdate()： 这个方法可以用于强制当前组件重新渲染。但要注意，$forceUpdate 并不会触发子组件的重新渲染。
+
+  Vue.set 或 this.$set： 当你需要在对象上添加新属性时，可以使用 Vue.set 或 this.$set 方法，这样 Vue 就能够监听到变化。对于数组，使用 splice 或 slice 方法同样能触发更新。
+
+  javascript
+  Copy code
+  // 对象
+  Vue.set(this.parentData, 'newProperty', 'new value');
+  // 或者
+  this.$set(this.parentData, 'newProperty', 'new value');
+
+  // 数组
+  this.parentData.splice(index, 1, newValue);
+  // 或者
+  this.parentData = this.parentData.slice();
+  虽然可以采用以上方法强制更新视图，但这并不是推荐的做法。更好的方式是遵循 Vue 的设计原则，通过事件（$emit）来进行组件之间的通信，让父组件监听事件并在事件处理函数中修改数据。这样可以保持代码的可维护性和清晰性。
+
+vue生命周期？
+
+  Vue 实例有多个生命周期钩子，这些钩子函数提供了在实例生命周期不同阶段执行代码的机会。以下是 Vue 2.x 版本的生命周期钩子函数：
+
+  beforeCreate： 在实例初始化之后，数据观测 (data observer) 和 event/watcher 事件配置之前被调用。
+
+  created： 在实例创建完成后被立即调用。在这一步，实例已完成以下的配置：数据观测 (data observer)，属性和方法的运算，watch/event 事件回调。然而，挂载阶段还没开始，$el 属性目前尚不可用。
+
+  beforeMount： 在挂载开始之前被调用：相关的 render 函数首次被调用。
+
+  mounted： el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用该钩子。如果根实例挂载到了一个文档内的元素上，当 mounted 被调用时 vm.$el 也在文档内。
+
+  beforeUpdate： 数据更新时调用，发生在虚拟 DOM 重新渲染和打补丁之前。
+
+  updated： 由于数据更改导致的虚拟 DOM 重新渲染和打补丁后调用。
+
+  beforeDestroy： 在实例销毁之前调用。在这一步，实例仍然完全可用。
+
+  destroyed： 在实例销毁后调用。该钩子被调用后，Vue 实例指示的所有东西都会解绑，所有事件监听器会被移除，所有子实例也会被销毁。
+
+  此外，还有一些较少使用的钩子函数，如 errorCaptured、activated 和 deactivated。这些钩子函数提供了更灵活的控制和响应实例生命周期的方式。
+
+  在 Vue 3.x 中，生命周期钩子的名称和调用时机有些变化，但整体结构基本相似。请根据你所使用的 Vue 版本查阅相应的文档。
