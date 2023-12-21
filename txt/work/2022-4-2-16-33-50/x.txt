@@ -21,6 +21,8 @@ const debounce = (fn,time)=>{
   }
 }
 
+pnpm create vite@2.9.0 mangosteen-fe-1 -- --template vue-ts
+
 自我介绍
 面试官您好，我叫xxx，毕业于xxx学校xxx专业，本科学历。我在上一份工作中主要负责小程序和H5的开发，使用Taro+React技术栈，参与了三款微信小程序的开发、维护与发版，同时也负责了项目中的前端H5部分。在项目中，我曾面临过挑战，比如...，我通过...的方式成功解决了这个问题。
 
@@ -1061,3 +1063,336 @@ vue生命周期？
   此外，还有一些较少使用的钩子函数，如 errorCaptured、activated 和 deactivated。这些钩子函数提供了更灵活的控制和响应实例生命周期的方式。
 
   在 Vue 3.x 中，生命周期钩子的名称和调用时机有些变化，但整体结构基本相似。请根据你所使用的 Vue 版本查阅相应的文档。
+
+
+12/21
+为什么不用NodeJS而用Ruby on Rails?
+
+  选择使用Node.js或Ruby on Rails取决于项目的需求、团队的经验、个人偏好等多个因素。当别人问你为什么选择Ruby on Rails而不是Node.js时，你可以考虑以下一些方面作为回答的参考：
+
+  1.开发速度：
+
+  强调Ruby on Rails的约定大于配置的理念，以及其提供的代码生成器和内置功能，可以加速开发过程。
+  2.开发人员体验：
+
+  Ruby on Rails以简洁而富有表达力的语法而闻名，这可以提高开发人员的工作效率和愉悦度。
+  社区和生态系统：
+
+  强调Ruby on Rails拥有强大的社区支持和丰富的Gem生态系统，让你能够快速找到解决方案，并使用现成的库和工具。
+  3.约定大于配置：
+
+  Ruby on Rails采用约定大于配置的原则，提供了一套默认的最佳实践，这可以减少项目中的配置和规范。
+  4.全栈框架：
+
+  Ruby on Rails是一个全栈框架，提供了一整套解决方案，包括数据库访问、路由、模板引擎等，使得构建整体功能的过程更加顺畅。
+  5.团队技能：
+
+  如果你的团队成员更熟悉Ruby on Rails，选择该框架可能会提高团队的效率。技术栈的选择通常也受到团队成员的技能和经验的影响。
+  特定需求：
+
+  某些项目可能对特定的框架或语言有需求，比如特定的扩展、库或插件。如果Ruby on Rails正好满足这些需求，那么选择它是有道理的。
+  在回答这个问题时，最好能够根据具体的项目需求和团队情况提供具体的原因。同时，强调选择任何技术栈都是基于实际情况和团队的需求，没有绝对的对错。
+
+斐波那契数列求 n ...
+
+  斐波那契数列是一组数列，其中每个数是前两个数的和。数学上，它可以递归地定义为：
+
+  F(n)=F(n−1)+F(n−2)
+
+  其中，F(0)=0，F(1)=1。
+
+  在编程中，可以使用递归或迭代的方式来计算斐波那契数列的第 n 项。下面是两种常见的方法：
+
+  递归方法：
+  javascript
+  Copy code
+  function fibonacciRecursive(n) {
+    if (n <= 1) {
+      return n;
+    } else {
+      return fibonacciRecursive(n - 1) + fibonacciRecursive(n - 2);
+    }
+  }
+
+  // 示例
+  const result = fibonacciRecursive(5); // 第5项是 5
+  console.log(result);
+  这种方法简单直观，但在计算较大的斐波那契数时，会因为重复计算而效率较低。
+
+  迭代方法：
+  javascript
+  Copy code
+  function fibonacciIterative(n) {
+    let a = 0, b = 1, temp;
+
+    for (let i = 2; i <= n; i++) {
+      temp = a + b;
+      a = b;
+      b = temp;
+    }
+
+    return n === 0 ? a : b;
+  }
+
+  // 示例
+  const result = fibonacciIterative(5); // 第5项是 5
+  console.log(result);
+  迭代方法避免了递归中的重复计算，因此在大多数情况下更有效。这里使用了两个变量 a 和 b 来存储中间结果，通过循环逐步计算得到第 n 项。
+
+  选择递归还是迭代取决于具体的需求和性能要求。在计算较大的斐波那契数列时，迭代通常更为高效。
+
+前端在从输入url到网页展示内容的过程中有哪些涉及了缓存
+
+  在前端从输入URL到网页展示内容的过程中，涉及了多个环节和阶段，其中一些可能涉及到缓存。以下是一些可能涉及到缓存的阶段：
+
+  1.DNS 缓存：
+
+  当用户输入URL时，浏览器首先需要解析域名到IP地址。这个过程中可能涉及到本地DNS缓存和系统DNS缓存。如果之前已经解析过相同的域名，浏览器可以直接使用缓存中的IP地址，而无需发起新的DNS查询。
+
+  2.浏览器缓存：
+
+  浏览器会将已经访问过的资源缓存到本地，包括HTML、CSS、JavaScript文件、图片等。如果网站的资源在一定时间内没有发生变化，浏览器可以直接从缓存中加载资源，而不需要重新下载。
+
+  3.HTTP 缓存：
+
+  服务器通过HTTP响应头中的缓存控制字段（如Cache-Control和Expires）来控制浏览器是否缓存资源以及缓存的有效期。浏览器在请求资源时会检查这些响应头，从而判断是否使用缓存。
+
+  4.Service Worker 缓存：
+
+  如果网站使用了Service Worker，它可以拦截和处理网络请求，实现自定义的缓存逻辑。Service Worker 可以将资源缓存到本地，从而实现离线访问和更高级的缓存控制。
+
+  5.前端框架和库的缓存：
+
+  如果你使用了一些前端框架或库，这些框架和库的代码文件也可能会被浏览器缓存。当用户再次访问相同的页面时，这些文件可以直接从缓存中加载，而无需重新下载。
+
+  6.CDN 缓存：
+
+  如果网站使用了内容分发网络（CDN），CDN服务器可能会缓存网站的静态资源，从而加速资源的加载速度。CDN缓存通常由CDN提供商管理。
+  总体而言，缓存是提高网页加载速度和减轻服务器压力的重要机制。但需要注意，缓存可能导致问题，例如当资源发生变化时可能无法立即更新，因此在开发和部署过程中，需要注意缓存策略的设置和管理。
+
+http缓存有哪些？有什么区别？应用场景有什么？
+
+  HTTP缓存有多种策略，其中一些常见的包括：
+
+  1.强缓存（Expires 和 Cache-Control）：
+
+  Expires： 服务器在响应头中返回一个过期时间，表示资源在这个过期时间之前可直接从浏览器缓存中加载，无需再向服务器发起请求。缺点是它依赖于客户端和服务器的时间一致性。
+  http
+  Copy code
+  Expires: Wed, 21 Oct 2023 07:28:00 GMT
+  Cache-Control： 使用Cache-Control可以更精确地定义缓存策略，可以设置max-age表示资源在指定秒数内有效。
+  http
+  Copy code
+  Cache-Control: max-age=3600
+
+  2.协商缓存（Last-Modified 和 ETag）：
+
+  Last-Modified： 服务器在响应头中返回资源的最后修改时间。浏览器再次请求资源时，通过If-Modified-Since头部将上次的最后修改时间发送给服务器，如果资源在这个时间之后未发生修改，服务器返回304状态，告诉浏览器可以使用本地缓存。
+  http
+  Copy code
+  Last-Modified: Tue, 20 Oct 2023 14:30:00 GMT
+  ETag： 服务器返回一个唯一的标识符（通常是资源的哈希值），浏览器再次请求资源时通过If-None-Match头部将上次的标识符发送给服务器，如果标识符匹配，服务器返回304状态。
+  http
+  Copy code
+  ETag: "abc123"
+  缓存控制策略的组合：
+
+  开发者可以同时使用强缓存和协商缓存来实现更灵活的缓存策略。例如，可以使用Cache-Control的max-age设置强缓存，同时使用Last-Modified或ETag实现协商缓存。
+  区别：
+  强缓存： 完全绕过了服务器，直接从本地缓存中获取资源，不会发起请求，适用于不经常变化的静态资源。
+
+  协商缓存： 发起了请求，但服务器可以告诉浏览器资源未发生变化，可以使用本地缓存，适用于可能发生变化的资源。
+
+  应用场景：
+  强缓存适用于：
+
+  不经常变化的静态资源，如图片、CSS文件、JS文件等。
+  需要优化加载速度的页面元素。
+  协商缓存适用于：
+
+  经常变化但可能未变化的资源，如动态生成的内容。
+  对带宽敏感或资源容易更新的情况，可以减少不必要的请求次数。
+  组合使用：
+
+  可以结合使用强缓存和协商缓存，根据资源的特性选择合适的缓存策略。
+  综合使用强缓存和协商缓存可以更灵活地控制缓存策略，提高页面性能和用户体验。
+
+有哪些知道的算法？
+
+  只说了个冒泡= =
+  搜索，排序，递归与分治，回溯，动态规划，贪心，字符串匹配，图的最小路径
+
+  前端开发中，涉及到的算法种类繁多，而具体需要掌握哪些算法很大程度上取决于你的项目需求和所处域。以下是一些在前端开发中比较常见的算法：
+
+  1.搜索算法：
+
+  二分查找： 在有序数组中查找特定元素。
+  深度优先搜索（DFS）和广度优先搜索（BFS）： 用于图遍历或树遍历。
+  
+  2.排序算法：
+
+  冒泡排序、选择排序、插入排序： 简单的排序算法。
+  快速排序、归并排序： 高效的排序算法。
+  
+  3.递归与分治算法：
+
+  递归： 通过函数调用自身解决问题。
+  分治： 将问题分解成子问题然后组合结果。
+  
+  4.动态规划：
+
+  背包问题、最长递增子序列（LIS）： 优化问题的解决方案。
+  斐波那契数列： 使用动态规划进行优化。
+  
+  5.图算法：
+
+  最短路径算法（Dijkstra、Bellman-Ford）： 在图中找到最短路径。
+  拓扑排序： 对有向无环图进行排序。
+  
+  6.字符串匹配算法：
+
+  KMP算法： 高效地在长字符串中找到模式串的位置。
+  
+  7.贪心算法：
+
+  零钱兑换问题： 找到满足某个条件的最小数量。
+  
+  8.位运算：
+
+  异或操作： 用于交换两个数、判断奇偶等。
+  位掩码： 通过位运算进行状态管理。
+  
+  9.回溯算法：
+
+  八皇后问题、子集、组合问题： 在所有可能的解中搜索满足条件的解。
+  
+  10.算法复杂度分析：
+
+  理解时间复杂度和空间复杂度，分析算法的效率。
+
+  这只是一个概览，具体的应用场景和需求可能需要更深入的算法知识。在实际的前端开发中，通常更关注数据结构和算法如何应用于解决具体的问题，而不仅仅是学习算法本身。例如，前端开发中常涉及到对数组、链表、树等数据结构的操作，以及对搜索、排序等算法的使用。
+
+一个并发控制的函数
+
+  下面是一个简单的手写并发控制函数的例子，使用了JavaScript中的Promise和setTimeout：
+
+  javascript
+  Copy code
+  function concurrentControl(tasks, concurrency) {
+    const results = [];
+    let index = 0;
+
+    return new Promise((resolve, reject) => {
+      function runNext() {
+        if (index === tasks.length) {
+          resolve(results);
+          return;
+        }
+
+        const task = tasks[index];
+        index++;
+
+        const currentTask = task().then(result => {
+          results.push(result);
+        });
+
+        currentTask.then(() => {
+          runNext();
+        });
+
+        // 控制并发数
+        if (index - results.length < concurrency) {
+          runNext();
+        }
+      }
+
+      runNext();
+    });
+  }
+
+  // 示例用法
+  const asyncTask = (id) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        console.log(`Task ${id} completed`);
+        resolve(`Task ${id} result`);
+      }, 2000);
+    });
+  };
+
+  const tasks = [
+    () => asyncTask(1),
+    () => asyncTask(2),
+    () => asyncTask(3),
+    () => asyncTask(4),
+    () => asyncTask(5)
+  ];
+
+  concurrentControl(tasks, 2)
+    .then(results => {
+      console.log('All tasks completed:', results);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  这个函数 concurrentControl 接受两个参数，一个是任务数组 tasks，另一个是并发数 concurrency。它返回一个 Promise，在所有任务完成时解析，并将结果数组传递给 resolve。函数内部使用递归和 setTimeout 来控制任务的并发执行。
+
+  这只是一个简单的示例，实际应用中可能需要更多的错误处理和逻辑。此外，还可以使用现代JavaScript工具，如 async/await、Promise.all等，来更方便地实现并发控制。
+
+  使用现代JavaScript：
+  
+  当我们希望限制并发执行异步任务的数量时，可以使用现代 JavaScript 中的 async/await 和 Promise 的特性。以下是一个简单的手写并发控制函数的例子：
+
+  javascript
+  Copy code
+  async function concurrentControl(tasks, concurrency) {
+    const results = [];
+    const runningTasks = [];
+
+    async function runTask(task) {
+      const result = await task();
+      results.push(result);
+    }
+
+    for (const task of tasks) {
+      const taskPromise = runTask(task);
+      runningTasks.push(taskPromise);
+
+      if (runningTasks.length >= concurrency) {
+        // 控制并发数
+        await Promise.race(runningTasks);
+      }
+    }
+
+    // 等待所有任务完成
+    await Promise.all(runningTasks);
+
+    return results;
+  }
+
+  // 示例用法
+  const asyncTask = (id) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        console.log(`Task ${id} completed`);
+        resolve(`Task ${id} result`);
+      }, 1000);
+    });
+  };
+
+  const tasks = [
+    () => asyncTask(1),
+    () => asyncTask(2),
+    () => asyncTask(3),
+    () => asyncTask(4),
+    () => asyncTask(5),
+  ];
+
+  concurrentControl(tasks, 2)
+    .then(results => {
+      console.log('All tasks completed:', results);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  在这个例子中，concurrentControl 函数接收一个任务数组 tasks 和并发数 concurrency。它使用 async/await 和 Promise 来控制并发执行任务，确保不超过指定的并发数。Promise.race 用于在任务中有空闲位置时，等待其中一个任务完成，从而维持并发数。
