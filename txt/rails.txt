@@ -896,3 +896,9 @@ http://120.77.206.191:8080/apidoc/cv/index.html
 
 http://120.77.206.191:8080/#/sign_in?preview=yes
 bug感觉改得差不多了。2023/11/23，历时23天？
+
+替换https证书
+scp -r /workspaces/oh-my-env/temp/fk mangosteen@120.77.206.191:/home/mangosteen/cert
+/home/mangosteen/cert/fk/www.chenjunhuang.top.pem
+/home/mangosteen/cert/fk/www.chenjunhuang.top.key
+docker exec -it mangosteen-nginx-1 nginx -s reload
